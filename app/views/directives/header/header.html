@@ -11,11 +11,12 @@
       <div id="header-logo"></div>
     </a>
   </div>
-  <div class="nav contextselector-pf hidden-xs hidden-sm" ng-show="clusterConsoleURL">
+  <div class="nav contextselector-pf hidden-xs hidden-sm" >
     <select class="selectpicker contextselector">
       <option value="catalog">Service Catalog</option>
       <option value="application-console">Application Console</option>
-      <option value="cluster-console">Cluster Console</option>
+      <option ng-if="clusterConsoleURL" value="cluster-console">Cluster Console</option>
+      <option value="quota-dashboard">Quota Dashboard</option>
     </select>
   </div>
   <navbar-utility></navbar-utility>

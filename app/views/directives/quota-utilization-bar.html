@@ -1,0 +1,23 @@
+<div class="progress-container progress-description-left progress-label-right">
+  <div class="progress-description">
+    <span class="{{ctrl.quotaIconClass}}" aria-hidden="true" />
+    <span>{{ctrl.quotaTitle}}</span>
+  </div>
+  <div ng-if="!ctrl.quotaData.dataAvailable" class="progress progress-unavailable">
+    Data Unavailable
+  </div>
+  <div ng-if="ctrl.quotaData.dataAvailable" class="progress">
+    <div class="progress-bar {{ctrl.quotaData.statusClass}}" role="progressbar"
+         aria-valuenow="{{ctrl.quotaData.used}}" aria-valuemin="0" aria-valuemax="{{ctrl.quotaData.total}}"
+         ng-style="{width:ctrl.quotaData.percentUsed + '%'}"
+         uib-tooltip="{{ctrl.quotaData.percentUsed + '% Used'}}">
+      <span><strong>{{ctrl.valuePrefix}}{{ctrl.quotaData.used}} of {{ctrl.valuePrefix}}{{ctrl.quotaData.total}}</strong> {{ctrl.units}}</span>
+    </div>
+    <div class="progress-bar progress-bar-remaining" role="progressbar"
+         aria-valuenow="{{ctrl.quotaData.available}}" aria-valuemin="0" aria-valuemax="{{ctrl.quotaData.total}}"
+         ng-style="{width:ctrl.quotaData.percentAvailable + '%'}"
+         uib-tooltip="{{ctrl.quotaData.percentAvailable + '% Available'}}">
+      <span class="sr-only">{{ctrl.quotaData.available}}% Available</span>
+    </div>
+  </div>
+</div>

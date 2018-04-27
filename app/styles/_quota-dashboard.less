@@ -1,0 +1,155 @@
+.project-quota-card {
+  .project-actions {
+    float: right;
+    margin-top: -5px;
+  }
+  .progress-description {
+    .fa, .pficon {
+      margin-right: 5px;
+    }
+  }
+  .progress-unavailable {
+    text-align: center;
+  }
+  .quota-dashboard-chart {
+    display: inline-block;
+  }
+  .quota-donut-chart-container {
+    float: left;
+    height: 75px;
+    position: relative;
+    width: 75px;
+    .quota-donut-chart-title {
+      font-size: 24px;
+      padding: 15px;
+      position: absolute;
+      text-align:center;
+      top: 0;
+      width: 100%;
+    }
+  }
+}
+
+.clickable-row {
+  cursor: pointer;
+}
+
+.pending-requests-row {
+  width: 100%;
+}
+
+.order-workflow-canvas {
+  height: 100%;
+  margin-left: 25px;
+  overflow: auto;
+  width: 100%;
+
+  .canvas-in-connection-mode {
+    background-color: @color-pf-black-400;
+    background-image: none !important;
+    background-repeat: unset !important;
+  }
+
+  .node-header {
+    display: table;
+    font-size: 24px;
+    margin-bottom: -10px;
+    text-align: center;
+    width: 100%;
+  }
+
+  .node-header-detail {
+    display: table;
+    font-size: 12px;
+    height: 20px;
+    margin-bottom: 10px;
+    text-align: center;
+    width: 100%;
+  }
+
+  .node-status-icon {
+    color: @color-pf-black-700;
+    font-size: 60px;
+    text-align: center;
+    width: 100%;
+  }
+
+  .node-info-title {
+    margin-left: 20px;
+    margin-top: 10px;
+  }
+  .node-info-item {
+    margin-left: 30px;
+    margin-top: 5px;
+  }
+
+  .node-center-icon {
+    font-size: 72px;
+  }
+  .node-rect {
+    fill: @color-pf-white;
+    fill-opacity: 1.0;
+    stroke: @color-pf-black-400;
+    stroke-width: 2;
+  }
+  .node-icon {
+    font-size: 76px;
+  }
+  .svg-triangle {
+    polyline {
+      fill: @color-pf-black-150;
+      stroke: @color-pf-black-400;
+      stroke-width: 2;
+    }
+  }
+  .connector-icons {
+    cursor: pointer;
+    fill: @color-pf-blue-400;
+    font-size: 16px;
+    &:hover {
+      fill: #063451;
+    }
+  }
+  .connector-tooltip {
+    fill: @color-pf-black-150;
+    stroke-width: 1;
+    stroke: @color-pf-black;
+  }
+  .connector-tooltip-text {
+    font-size: 10px;
+  }
+  .connector-circle {
+    fill: @color-pf-white;
+    stroke-width: 2;
+    stroke: @color-pf-black;
+  }
+  .unconnected-circle {
+    fill: @color-pf-green-500;
+    stroke: @color-pf-black;
+    stroke-opacity: "0.8";
+    stroke-width: 2;
+  }
+  .connection-line {
+    fill: transparent;
+    stroke-width: 4;
+    stroke: @color-pf-black-500;
+  }
+  .connection-endpoint {
+    fill: @color-pf-black-500;
+    stroke: @color-pf-black;
+    stroke-width: 1;
+  }
+  .node-chart-title, .node-chart-units {
+    padding: 0 10px;
+    float: left;
+    width: 60px;
+  }
+  .node-chart-progress {
+    display: inline-block;
+    float: left;
+    width: 180px;
+  }
+  .connection-name {
+    fill: @color-pf-black;
+  }
+}

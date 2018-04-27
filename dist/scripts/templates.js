@@ -7363,11 +7363,12 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "<div id=\"header-logo\"></div>\n" +
     "</a>\n" +
     "</div>\n" +
-    "<div class=\"nav contextselector-pf hidden-xs hidden-sm\" ng-show=\"clusterConsoleURL\">\n" +
+    "<div class=\"nav contextselector-pf hidden-xs hidden-sm\">\n" +
     "<select class=\"selectpicker contextselector\">\n" +
     "<option value=\"catalog\">Service Catalog</option>\n" +
     "<option value=\"application-console\">Application Console</option>\n" +
-    "<option value=\"cluster-console\">Cluster Console</option>\n" +
+    "<option ng-if=\"clusterConsoleURL\" value=\"cluster-console\">Cluster Console</option>\n" +
+    "<option value=\"quota-dashboard\">Quota Dashboard</option>\n" +
     "</select>\n" +
     "</div>\n" +
     "<navbar-utility></navbar-utility>\n" +
@@ -9195,6 +9196,39 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "</span>\n" +
     "</ng-form>\n" +
     "</fieldset>"
+  );
+
+
+  $templateCache.put('views/directives/quota-donut-chart.html',
+    "<div class=\"quota-donut-chart-container\" data-toggle=\"tooltip\" data-original-title=\"{{ctrl.quotaData.tooltip}}\">\n" +
+    "<pf-donut-pct-chart ng-if=\"ctrl.quotaData.dataAvailable\" config=\"ctrl.quotaConfig\" data=\"ctrl.quotaData\">\n" +
+    "</pf-donut-pct-chart>\n" +
+    "<div class=\"quota-donut-chart-title\">\n" +
+    "<span class=\"{{ctrl.quotaIconClass}}\" aria-hidden=\"true\"/>\n" +
+    "<span class=\"sr-only\">{{ctrl.quotaTitle}}</span>\n" +
+    "</div>\n" +
+    "</div>"
+  );
+
+
+  $templateCache.put('views/directives/quota-utilization-bar.html',
+    "<div class=\"progress-container progress-description-left progress-label-right\">\n" +
+    "<div class=\"progress-description\">\n" +
+    "<span class=\"{{ctrl.quotaIconClass}}\" aria-hidden=\"true\"/>\n" +
+    "<span>{{ctrl.quotaTitle}}</span>\n" +
+    "</div>\n" +
+    "<div ng-if=\"!ctrl.quotaData.dataAvailable\" class=\"progress progress-unavailable\">\n" +
+    "Data Unavailable\n" +
+    "</div>\n" +
+    "<div ng-if=\"ctrl.quotaData.dataAvailable\" class=\"progress\">\n" +
+    "<div class=\"progress-bar {{ctrl.quotaData.statusClass}}\" role=\"progressbar\" aria-valuenow=\"{{ctrl.quotaData.used}}\" aria-valuemin=\"0\" aria-valuemax=\"{{ctrl.quotaData.total}}\" ng-style=\"{width:ctrl.quotaData.percentUsed + '%'}\" uib-tooltip=\"{{ctrl.quotaData.percentUsed + '% Used'}}\">\n" +
+    "<span><strong>{{ctrl.valuePrefix}}{{ctrl.quotaData.used}} of {{ctrl.valuePrefix}}{{ctrl.quotaData.total}}</strong> {{ctrl.units}}</span>\n" +
+    "</div>\n" +
+    "<div class=\"progress-bar progress-bar-remaining\" role=\"progressbar\" aria-valuenow=\"{{ctrl.quotaData.available}}\" aria-valuemin=\"0\" aria-valuemax=\"{{ctrl.quotaData.total}}\" ng-style=\"{width:ctrl.quotaData.percentAvailable + '%'}\" uib-tooltip=\"{{ctrl.quotaData.percentAvailable + '% Available'}}\">\n" +
+    "<span class=\"sr-only\">{{ctrl.quotaData.available}}% Available</span>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>"
   );
 
 
@@ -13271,6 +13305,66 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
   );
 
 
+  $templateCache.put('views/project-requests.html',
+    "<div class=\"middle surface-shaded\">\n" +
+    "<div class=\"middle\">\n" +
+    "<div class=\"middle-header\">\n" +
+    "<div class=\"container-fluid\">\n" +
+    "<ol class=\"breadcrumb\">\n" +
+    "<li class=\"active\">\n" +
+    "<a href=\"{{project | projectUrl : $ctrl.baseProjectUrl}}\">{{project | displayName}}</a>\n" +
+    "</li>\n" +
+    "<li>\n" +
+    "<strong>Pending Requests</strong>\n" +
+    "</li>\n" +
+    "</ol>\n" +
+    "<div>\n" +
+    "<table class=\"table table-bordered table-mobile\">\n" +
+    "<thead>\n" +
+    "<tr>\n" +
+    "<th>Request</th>\n" +
+    "<th>Requester</th>\n" +
+    "<th>Request Date</th>\n" +
+    "<th>Approval Status</th>\n" +
+    "<th>Pending Approver</th>\n" +
+    "<th>Approval Request</th>\n" +
+    "</tr>\n" +
+    "</thead>\n" +
+    "<tbody ng-if=\"(pendingRequests | hashSize) == 0\">\n" +
+    "<tr><td colspan=\"4\"><em>There are no pending requests</em></td></tr>\n" +
+    "</tbody>\n" +
+    "<tbody ng-if=\"(pendingRequests | hashSize) > 0\">\n" +
+    "<tr ng-repeat=\"pendingRequest in pendingRequests\" ng-click=\"navigateTo(pendingRequest)\" class=\"clickable-row\">\n" +
+    "<td data-title=\"Request\">\n" +
+    "<span>{{pendingRequest.service | displayName}}</span>\n" +
+    "</td>\n" +
+    "<td data-title=\"Requester\">\n" +
+    "<span>{{pendingRequest.requester}}</span>\n" +
+    "</td>\n" +
+    "<td data-title=\"Request Date\">\n" +
+    "<span class=\"date\">{{pendingRequest.requestTimestamp | date:'shortDate'}}</span>\n" +
+    "<span class=\"time\">{{pendingRequest.requestTimestamp | date:'mediumTime'}}</span>\n" +
+    "</td>\n" +
+    "<td data-title=\"Approval Status\">\n" +
+    "<span>{{pendingRequest.approvalStatus}}</span>\n" +
+    "</td>\n" +
+    "<td data-title=\"Pending Approver\">\n" +
+    "<span>{{pendingRequest.approver}}</span>\n" +
+    "</td>\n" +
+    "<td data-title=\"Approval Request\">\n" +
+    "<span am-time-ago=\"pendingRequest.approvalRequestTimestamp\"></span>\n" +
+    "</td>\n" +
+    "</tr>\n" +
+    "</tbody>\n" +
+    "</table>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>"
+  );
+
+
   $templateCache.put('views/projects.html',
     "<div class=\"middle surface-shaded\">\n" +
     "<origin-modal-popup class=\"projects-list-create-popup\" shown=\"newProjectPanelShown\" modal-title=\"Create Project\" on-close=\"closeNewProjectPanel\" reference-element=\"popupElement\">\n" +
@@ -13292,11 +13386,21 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "<div class=\"projects-bar\">\n" +
     "<h1>My Projects</h1>\n" +
     "<div class=\"projects-options\">\n" +
-    "<div class=\"projects-add\" ng-if=\"canCreate\">\n" +
-    "<button ng-click=\"createProject($event)\" class=\"btn btn-primary\">\n" +
+    "<div class=\"projects-add\">\n" +
+    "<button ng-if=\"canCreate\" ng-click=\"createProject($event)\" class=\"btn btn-primary\">\n" +
     "<span class=\"fa fa-plus\" aria-hidden=\"true\"></span>\n" +
     "<span class=\"icon-button-text\">Create Project</span>\n" +
     "</button>\n" +
+    "<div class=\"projects-view-select\">\n" +
+    "<button class=\"btn btn-link\" ng-class=\"{'active': viewType !== 'quota'}\" title=\"List View\" ng-click=\"setViewType('list')\">\n" +
+    "<i class=\"fa fa-th-list\" aria-hidden=\"true\"></i>\n" +
+    "<span class=\"sr-only\">List View</span>\n" +
+    "</button>\n" +
+    "<button class=\"btn btn-link\" ng-class=\"{'active': viewType === 'quota'}\" title=\"Quota View\" ng-click=\"setViewType('quota')\">\n" +
+    "<i class=\"fa fa-th\" aria-hidden=\"true\"></i>\n" +
+    "<span class=\"sr-only\">Quota View</span>\n" +
+    "</button>\n" +
+    "</div>\n" +
     "</div>\n" +
     "<div class=\"projects-search\">\n" +
     "<form role=\"form\" class=\"search-pf has-button\">\n" +
@@ -13344,7 +13448,7 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "The current filter is hiding all projects.\n" +
     "<button type=\"button\" class=\"btn btn-link inline-btn-link\" ng-click=\"search.text = ''\">Clear All Filters</button>\n" +
     "</div>\n" +
-    "<div ng-if=\"projects.length\" class=\"list-pf list-group projects-list\">\n" +
+    "<div ng-if=\"projects.length && viewType !== 'quota'\" class=\"list-pf list-group projects-list\">\n" +
     "<div ng-repeat=\"project in projects | limitTo: limitListTo track by (project | uid)\" class=\"list-pf-item list-group-item project-info tile-click\">\n" +
     "<div class=\"list-pf-container\">\n" +
     "<div class=\"list-pf-content list-pf-content-flex\">\n" +
@@ -13394,6 +13498,53 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "<origin-modal-popup shown=\"editProjectPanelShown && editingProject === project\" ng-class=\"{'with-description': (project | description | size)}\" modal-title=\"Edit Project\" on-close=\"closeEditProjectPanel\">\n" +
     "<edit-project project=\"project\" is-dialog=\"true\" redirect-action=\"onEditProject\" on-cancel=\"closeEditProjectPanel\"></edit-project>\n" +
     "</origin-modal-popup>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "<div ng-if=\"projects.length && viewType === 'quota'\" class=\"row row-cards-pf\">\n" +
+    "<div ng-repeat=\"project in projects | limitTo: limitListTo track by (project | uid)\" class=\"col-xs-12 col-sm-6 col-lg-4\">\n" +
+    "<div class=\"project-quota-card card-pf\">\n" +
+    "<div class=\"card-pf-heading\">\n" +
+    "<h2 class=\"card-pf-title\">\n" +
+    "<a href=\"{{project | projectUrl : $ctrl.baseProjectUrl}}\">\n" +
+    "{{project | displayName}}\n" +
+    "</a>\n" +
+    "<div class=\"project-actions\" ng-if=\"project.status.phase == 'Active'\">\n" +
+    "<div uib-dropdown class=\"dropdown pull-right dropdown-kebab-pf\">\n" +
+    "<button uib-dropdown-toggle class=\"btn btn-link dropdown-toggle\"><i class=\"fa fa-ellipsis-v\" aria-hidden=\"true\"></i><span class=\"sr-only\">Actions</span></button>\n" +
+    "<ul class=\"dropdown-menu dropdown-menu-right\" uib-dropdown-menu role=\"menu\">\n" +
+    "<li role=\"menuitem\">\n" +
+    "<a ng-href=\"project/{{project.metadata.name}}/membership\">\n" +
+    "View Membership\n" +
+    "</a>\n" +
+    "</li>\n" +
+    "<li role=\"menuitem\">\n" +
+    "<a href=\"\" ng-click=\"editProject(project)\">\n" +
+    "Edit Project\n" +
+    "</a>\n" +
+    "</li>\n" +
+    "<li role=\"menuitem\">\n" +
+    "<delete-project label=\"Delete Project\" project=\"project\" type-name-to-confirm=\"true\" stay-on-current-page=\"true\" success=\"onDeleteProject\">\n" +
+    "</delete-project>\n" +
+    "</li>\n" +
+    "</ul>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</h2>\n" +
+    "<origin-modal-popup shown=\"editProjectPanelShown && editingProject === project\" ng-class=\"{'with-description': (project | description | size)}\" modal-title=\"Edit Project\" on-close=\"closeEditProjectPanel\">\n" +
+    "<edit-project project=\"project\" is-dialog=\"true\" redirect-action=\"onEditProject\" on-cancel=\"closeEditProjectPanel\"></edit-project>\n" +
+    "</origin-modal-popup>\n" +
+    "</div>\n" +
+    "<div class=\"card-pf-body\">\n" +
+    "<quota-utilization-bar quota-title=\"CPUs\" quota-icon-class=\"pficon pficon-cpu\" units=\"Total\" project=\"project\" allowed-label=\"allowed_cpu\" allocated-label=\"allocated_cpu\">\n" +
+    "</quota-utilization-bar>\n" +
+    "<quota-utilization-bar quota-title=\"Memory\" quota-icon-class=\"pficon pficon-memory\" units=\"GB\" project=\"project\" allowed-label=\"allowed_memory\" allocated-label=\"allocated_memory\">\n" +
+    "</quota-utilization-bar>\n" +
+    "<quota-utilization-bar quota-title=\"Storage\" quota-icon-class=\"pficon pficon-storage-domain\" units=\"GB\" project=\"project\" allowed-label=\"allowed_storage\" allocated-label=\"allocated_storage\">\n" +
+    "</quota-utilization-bar>\n" +
+    "<quota-utilization-bar quota-title=\"Cost\" quota-icon-class=\"fa fa-usd\" value-prefix=\"$\" project=\"project\" allowed-label=\"allowed_cost\" allocated-label=\"allocated_cost\">\n" +
+    "</quota-utilization-bar>\n" +
     "</div>\n" +
     "</div>\n" +
     "</div>\n" +
@@ -13673,6 +13824,81 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
   );
 
 
+  $templateCache.put('views/quotas-dashboard.html',
+    "<div class=\"qumiddle surface-shaded\">\n" +
+    "<div class=\"middle-content\">\n" +
+    "<div class=\"container-fluid\">\n" +
+    "<div class=\"row\">\n" +
+    "<div class=\"col-md-12\">\n" +
+    "<div class=\"projects-header\">\n" +
+    "<div class=\"projects-bar\">\n" +
+    "<h1>Quota Dashboard - {{user.fullName || user.metadata.name}}</h1>\n" +
+    "<div class=\"projects-options\">\n" +
+    "<div class=\"projects-search\">\n" +
+    "<form role=\"form\" class=\"search-pf has-button\">\n" +
+    "<div class=\"form-group has-clear\">\n" +
+    "<div class=\"search-pf-input-group\">\n" +
+    "<label for=\"search-projects\" class=\"sr-only\">Filter by keyword</label>\n" +
+    "<input type=\"search\" class=\"form-control\" placeholder=\"Filter by keyword\" id=\"search-projects\" ng-model=\"search.text\">\n" +
+    "<button type=\"button\" class=\"clear\" aria-hidden=\"true\" ng-if=\"search.text\" ng-click=\"search.text = ''\">\n" +
+    "<span class=\"pficon pficon-close\"></span>\n" +
+    "</button>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</form>\n" +
+    "<span class=\"vertical-divider\"></span>\n" +
+    "<span class=\"projects-sort-label\">Sort by</span>\n" +
+    "<div class=\"projects-sort\">\n" +
+    "<pf-sort config=\"sortConfig\" class=\"sort-controls\"></pf-sort>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "<div ng-if=\"loading\" class=\"empty-state-message\">\n" +
+    "<h2 class=\"text-center\">Loading...</h2>\n" +
+    "</div>\n" +
+    "<div ng-if=\"!loading\" class=\"row row-cards-pf\">\n" +
+    "<div ng-repeat=\"project in projects | limitTo: limitListTo track by (project | uid)\" class=\"col-xs-12 col-sm-6 col-lg-4\">\n" +
+    "<div class=\"project-quota-card card-pf\">\n" +
+    "<div class=\"card-pf-heading\">\n" +
+    "<div class=\"card-pf-footer-in-header\">\n" +
+    "<span class=\"card-pf-time-frame-filter\">\n" +
+    "<a ng-if=\"project.pendingRequestsCount\" href=\"quotas/requests/{{project.metadata.name}}\">\n" +
+    "<span class=\"badge\">{{project.pendingRequestsCount}}</span>\n" +
+    "Pending Requests\n" +
+    "</a>\n" +
+    "</span>\n" +
+    "<h2 class=\"card-pf-title\">\n" +
+    "<a href=\"{{project | projectUrl : $ctrl.baseProjectUrl}}\">\n" +
+    "{{project | displayName}}\n" +
+    "</a>\n" +
+    "</h2>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "<div class=\"card-pf-body\">\n" +
+    "<quota-donut-chart chartid=\"{{project.metadata.name + '_cost'}}}\" class=\"quota-dashboard-chart\" quota-title=\"Cost\" quota-icon-class=\"fa fa-usd\" value-prefix=\"$\" total=\"project.quotaData.allocated_budget\" used=\"project.quotaData.used_budget\">\n" +
+    "</quota-donut-chart>\n" +
+    "<quota-donut-chart chartid=\"{{project.metadata.name + '_vms'}}}\" class=\"quota-dashboard-chart\" quota-title=\"VMs\" quota-icon-class=\"pficon pficon-virtual-machine\" units=\"Total\" total=\"project.quotaData.allocated_vms\" used=\"project.quotaData.used_vms\">\n" +
+    "</quota-donut-chart>\n" +
+    "<quota-donut-chart chartid=\"{{project.metadata.name + '_cpus'}}}\" class=\"quota-dashboard-chart\" quota-title=\"CPUs\" quota-icon-class=\"pficon pficon-cpu\" units=\"Total\" total=\"project.quotaData.allocated_cpus\" used=\"project.quotaData.used_cpus\">\n" +
+    "</quota-donut-chart>\n" +
+    "<quota-donut-chart chartid=\"{{project.metadata.name + '_memory'}}}\" class=\"quota-dashboard-chart\" quota-title=\"Memory\" quota-icon-class=\"pficon pficon-memory\" units=\"GB\" total=\"project.quotaData.allocated_memory_gb\" used=\"project.quotaData.used_memory_gb\">\n" +
+    "</quota-donut-chart>\n" +
+    "<quota-donut-chart chartid=\"{{project.metadata.name + '_storage'}}}\" class=\"quota-dashboard-chart\" quota-title=\"Storage\" quota-icon-class=\"pficon pficon-storage-domain\" units=\"GB\" allowed-label=\"allowed_storage\" allocated-label=\"allocated_storage\" total=\"project.quotaData.allocated_storage_gb\" used=\"project.quotaData.used_storage_gb\">\n" +
+    "</quota-donut-chart>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>"
+  );
+
+
   $templateCache.put('views/secrets.html',
     "<div class=\"middle\">\n" +
     "<div class=\"middle-header\">\n" +
@@ -13846,6 +14072,107 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "</div>\n" +
     "</div>\n" +
     "</project-page>"
+  );
+
+
+  $templateCache.put('views/service-request-flow.html',
+    "<div class=\"middle surface-shaded\">\n" +
+    "<div class=\"middle\">\n" +
+    "<div class=\"middle-header\">\n" +
+    "<div class=\"container-fluid\">\n" +
+    "<ol class=\"breadcrumb\">\n" +
+    "<li class=\"active\">\n" +
+    "<a href=\"{{project | projectUrl : baseProjectUrl}}\">{{project | displayName}}</a>\n" +
+    "</li>\n" +
+    "<li class=\"active\">\n" +
+    "<a href=\"quotas/requests/{{project.metadata.name}}\">Pending Requests</a>\n" +
+    "</li>\n" +
+    "<li>\n" +
+    "<strong>{{service | displayName}}</strong>\n" +
+    "</li>\n" +
+    "</ol>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "<div class=\"middle-content\">\n" +
+    "<div class=\"container-fluid\">\n" +
+    "<div class=\"order-workflow-canvas\">\n" +
+    "<svg class=\"read-only\" xmlns=\"http://www.w3.org/2000/svg\" ng-attr-width=\"{{chart.width}}\" ng-attr-height=\"{{chart.height}}\">\n" +
+    "<g>\n" +
+    "\n" +
+    "<g ng-repeat=\"node in chart.nodes\" ng-attr-transform=\"translate({{node.x()}}, {{node.y()}})\">\n" +
+    "\n" +
+    "<rect class=\"node-rect\" ry=\"0\" rx=\"0\" ng-attr-x=\"{{node.xOffset()}}\" ng-attr-y=\"{{node.yOffset()}}\" ng-attr-width=\"{{node.width()}}\" ng-attr-height=\"{{node.height()}}\">\n" +
+    "</rect>\n" +
+    "\n" +
+    "<foreignobject ng-attr-x=\"{{node.xOffset()}}\" ng-attr-y=\"{{node.yOffset()}}\" ng-attr-width=\"{{node.width()}}\">\n" +
+    "<span class=\"node-header\">\n" +
+    "{{node.nodeData('status')}}\n" +
+    "</span>\n" +
+    "<div ng-if=\"node.nodeData('type') === 'initial'\">\n" +
+    "<div class=\"node-header-detail\">\n" +
+    "{{service | displayName}}\n" +
+    "</div>\n" +
+    "<div class=\"node-info-item\">\n" +
+    "by {{node.nodeData('requester')}}\n" +
+    "</div>\n" +
+    "<div class=\"node-info-item\">\n" +
+    "at {{node.nodeData('initiatedTimestamp') | date : 'medium'}}\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "<div ng-if=\"node.nodeData('type') !== 'initial'\">\n" +
+    "<div class=\"node-header-detail\">\n" +
+    "<span ng-if=\"node.nodeData('status') === 'In Process'\">\n" +
+    "{{node.nodeData('initiatedTimestamp') | momentAgo}}\n" +
+    "</span>\n" +
+    "</div>\n" +
+    "<div class=\"node-status-icon {{node.nodeData('statusIconClass')}}\"></div>\n" +
+    "<div class=\"node-info-title\">\n" +
+    "APPROVER NAME\n" +
+    "</div>\n" +
+    "<div class=\"node-info-item\">\n" +
+    "{{node.nodeData('approverName')}}\n" +
+    "</div>\n" +
+    "<div ng-if=\"node.status() !== 'Pending'\">\n" +
+    "<div class=\"node-info-title\">\n" +
+    "APPROVAL REQUEST TIME\n" +
+    "</div>\n" +
+    "<div class=\"node-info-item\">\n" +
+    "{{node.nodeData('initiatedTimestamp') | date : 'medium'}}\n" +
+    "</div>\n" +
+    "<div class=\"node-info-title\">\n" +
+    "APPROVED\n" +
+    "</div>\n" +
+    "<div class=\"node-info-item\">\n" +
+    "<span ng-if=\"node.nodeData('status') === 'Approved'\">\n" +
+    "{{node.nodeData('approvalTimestamp') | date : 'medium'}}\n" +
+    "</span>\n" +
+    "<span ng-if=\"node.nodeData('status') === 'In Process'\">\n" +
+    "--\n" +
+    "</span>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</foreignobject>\n" +
+    "</g> \n" +
+    "\n" +
+    "<g ng-repeat=\"connection in chart.connections\" class=\"connection\">\n" +
+    "<g>\n" +
+    "<path class=\"connection-line\" ng-attr-d=\"M {{connection.sourceCoordX()}}, {{connection.sourceCoordY()}}\n" +
+    "                                   L {{connection.middleCoordX()}}, {{connection.sourceCoordY()}}\n" +
+    "                                   L {{connection.middleCoordX()}}, {{connection.destCoordY()}}\n" +
+    "                                   L {{connection.destCoordX()}}, {{connection.destCoordY()}}\">\n" +
+    "</path>\n" +
+    "<polygon class=\"connection-endpoint\" ng-attr-points=\"{{connection.destEndPoints(connectorSize)}}\">\n" +
+    "</polygon>\n" +
+    "</g>\n" +
+    "</g>\n" +
+    "</g>\n" +
+    "</svg>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>"
   );
 
 

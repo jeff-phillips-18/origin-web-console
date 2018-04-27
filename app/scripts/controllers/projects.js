@@ -33,6 +33,8 @@ angular.module('openshiftConsole')
     $scope.search = {
       text: ''
     };
+    $scope.viewType = 'list';
+    $scope.viewType = localStorage.getItem('projects.viewtype') || 'list';
 
     // Only show the first `MAX_PROJETS_TO_WATCH` on the page. Users can always filter.
     $scope.limitListTo = MAX_PROJETS_TO_WATCH;
@@ -171,6 +173,11 @@ angular.module('openshiftConsole')
 
     $scope.goToProject = function(projectName) {
       Navigate.toProjectOverview(projectName);
+    };
+
+    $scope.setViewType = function(viewType) {
+      $scope.viewType = viewType;
+      localStorage.setItem('projects.viewtype', viewType);
     };
 
     $scope.$watch('search.text', _.debounce(function(searchText) {

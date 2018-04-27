@@ -50,6 +50,10 @@ angular
         reloadOnSearch: false
       };
     }
+    var quotasDashboardRoute = {
+      templateUrl: 'views/quotas-dashboard.html',
+      controller: 'QuotasDashboardController'
+    };
     $routeProvider.when('/projects', projectsPageRoute);
     $routeProvider
       .when('/', {
@@ -58,6 +62,15 @@ angular
         }
       })
       .when('/catalog', landingPageRoute)
+      .when('/quotas', quotasDashboardRoute)
+      .when('/quotas/requests/:requestproject', {
+        templateUrl: 'views/project-requests.html',
+        controller: 'ProjectRequestsController'
+      })
+      .when('/quotas/requests/:requestproject/:service', {
+        templateUrl: 'views/service-request-flow.html',
+        controller: 'ServiceRequestFlowController'
+      })
       .when('/create-project', {
         templateUrl: 'views/create-project.html',
         controller: 'CreateProjectController'

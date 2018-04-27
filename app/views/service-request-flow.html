@@ -1,0 +1,111 @@
+<div class="middle surface-shaded">
+  <div class="middle">
+    <div class="middle-header">
+      <div class="container-fluid">
+        <ol class="breadcrumb">
+          <li class="active">
+            <a href="{{project | projectUrl : baseProjectUrl}}">{{project | displayName}}</a>
+          </li>
+          <li class="active">
+            <a href="quotas/requests/{{project.metadata.name}}">Pending Requests</a>
+          </li>
+          <li>
+            <strong>{{service | displayName}}</strong>
+          </li>
+        </ol>
+      </div>
+    </div>
+    <div class="middle-content">
+      <div class="container-fluid">
+        <div class="order-workflow-canvas">
+          <svg class="read-only"
+               xmlns="http://www.w3.org/2000/svg"
+               ng-attr-width="{{chart.width}}"
+               ng-attr-height="{{chart.height}}">
+            <g>
+              <!-- Main Node Loop -->
+              <g ng-repeat="node in chart.nodes" ng-attr-transform="translate({{node.x()}}, {{node.y()}})">
+                <!-- Node -->
+                <rect class="node-rect"
+                      ry="0"
+                      rx="0"
+                      ng-attr-x="{{node.xOffset()}}"
+                      ng-attr-y="{{node.yOffset()}}"
+                      ng-attr-width="{{node.width()}}"
+                      ng-attr-height="{{node.height()}}">
+                </rect>
+
+                <!-- Node Title -->
+                <foreignobject ng-attr-x="{{node.xOffset()}}"
+                               ng-attr-y="{{node.yOffset()}}"
+                               ng-attr-width="{{node.width()}}">
+                  <span class="node-header">
+                    {{node.nodeData('status')}}
+                  </span>
+                  <div ng-if="node.nodeData('type') === 'initial'">
+                    <div class="node-header-detail" >
+                      {{service | displayName}}
+                    </div>
+                    <div class="node-info-item">
+                      by {{node.nodeData('requester')}}
+                    </div>
+                    <div class="node-info-item">
+                      at {{node.nodeData('initiatedTimestamp') | date : 'medium'}}
+                    </div>
+                  </div>
+                  <div ng-if="node.nodeData('type') !== 'initial'">
+                    <div class="node-header-detail" >
+                      <span ng-if="node.nodeData('status') === 'In Process'">
+                        {{node.nodeData('initiatedTimestamp') | momentAgo}}
+                      </span>
+                    </div>
+                    <div class="node-status-icon {{node.nodeData('statusIconClass')}}"></div>
+                    <div class="node-info-title">
+                      APPROVER NAME
+                    </div>
+                    <div class="node-info-item">
+                      {{node.nodeData('approverName')}}
+                    </div>
+                    <div ng-if="node.status() !== 'Pending'">
+                      <div class="node-info-title">
+                        APPROVAL REQUEST TIME
+                      </div>
+                      <div class="node-info-item">
+                        {{node.nodeData('initiatedTimestamp') | date : 'medium'}}
+                      </div>
+                      <div class="node-info-title">
+                        APPROVED
+                      </div>
+                      <div class="node-info-item">
+                        <span ng-if="node.nodeData('status') === 'Approved'">
+                           {{node.nodeData('approvalTimestamp') | date : 'medium'}}
+                        </span>
+                        <span ng-if="node.nodeData('status') === 'In Process'">
+                           --
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </foreignobject>
+              </g> <!--  End Nodes Loop -->
+
+              <!-- Connections -->
+              <g ng-repeat="connection in chart.connections" class="connection">
+                <g>
+                  <path class="connection-line"
+                        ng-attr-d="M {{connection.sourceCoordX()}}, {{connection.sourceCoordY()}}
+                                   L {{connection.middleCoordX()}}, {{connection.sourceCoordY()}}
+                                   L {{connection.middleCoordX()}}, {{connection.destCoordY()}}
+                                   L {{connection.destCoordX()}}, {{connection.destCoordY()}}">
+                  </path>
+                  <polygon class="connection-endpoint" ng-attr-points="{{connection.destEndPoints(connectorSize)}}">
+                  </polygon>
+                </g>
+              </g>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

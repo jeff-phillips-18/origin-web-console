@@ -244,10 +244,13 @@ angular.module('openshiftConsole')
 
         var catalogPath = "/catalog";
         var projectsPath = "/projects";
+        var quotasPath = "/quotas";
 
         var setContextPickerSelectedOption = function(selector) {
           if ($location.path() === catalogPath) {
             selector.selectpicker("val", "catalog");
+          } else if ($location.path().startsWith(quotasPath)) {
+            selector.selectpicker("val", "quota-dashboard");
           } else {
             selector.selectpicker("val", "application-console");
           }
@@ -308,6 +311,9 @@ angular.module('openshiftConsole')
                 break;
               case "cluster-console":
                 window.location.assign($scope.clusterConsoleURL);
+                break;
+              case "quota-dashboard":
+                goToURL(quotasPath);
                 break;
             }
           });

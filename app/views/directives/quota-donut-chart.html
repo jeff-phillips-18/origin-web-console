@@ -1,0 +1,8 @@
+<div class="quota-donut-chart-container" data-toggle="tooltip" data-original-title="{{ctrl.quotaData.tooltip}}">
+  <pf-donut-pct-chart ng-if="ctrl.quotaData.dataAvailable" config="ctrl.quotaConfig" data="ctrl.quotaData">
+  </pf-donut-pct-chart>
+  <div class="quota-donut-chart-title">
+    <span class="{{ctrl.quotaIconClass}}" aria-hidden="true" />
+    <span class="sr-only">{{ctrl.quotaTitle}}</span>
+  </div>
+</div>

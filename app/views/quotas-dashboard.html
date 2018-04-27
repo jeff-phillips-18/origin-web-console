@@ -1,0 +1,123 @@
+<div class="qumiddle surface-shaded">
+  <div class="middle-content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="projects-header">
+            <div class="projects-bar">
+              <h1>Quota Dashboard - {{user.fullName || user.metadata.name}}</h1>
+              <div class="projects-options">
+                <div class="projects-search">
+                  <form role="form" class="search-pf has-button">
+                    <div class="form-group has-clear">
+                      <div class="search-pf-input-group">
+                        <label for="search-projects" class="sr-only">Filter by keyword</label>
+                        <input
+                          type="search"
+                          class="form-control"
+                          placeholder="Filter by keyword"
+                          id="search-projects"
+                          ng-model="search.text">
+                        <button
+                          type="button"
+                          class="clear"
+                          aria-hidden="true"
+                          ng-if="search.text"
+                          ng-click="search.text = ''">
+                          <span class="pficon pficon-close"></span>
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                  <span class="vertical-divider"></span>
+                  <span class="projects-sort-label">Sort by</span>
+                  <div class="projects-sort">
+                    <pf-sort config="sortConfig" class="sort-controls"></pf-sort>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div ng-if="loading" class="empty-state-message">
+            <h2 class="text-center">Loading...</h2>
+          </div>
+          <div ng-if="!loading" class="row row-cards-pf">
+            <div ng-repeat="project in projects | limitTo: limitListTo track by (project | uid)" class="col-xs-12 col-sm-6 col-lg-4">
+              <div class="project-quota-card card-pf">
+                <div class="card-pf-heading">
+                  <div class="card-pf-footer-in-header">
+                    <span class="card-pf-time-frame-filter">
+                      <a ng-if="project.pendingRequestsCount" href="quotas/requests/{{project.metadata.name}}">
+                        <span class="badge">{{project.pendingRequestsCount}}</span>
+                        Pending Requests
+                      </a>
+                    </span>
+                    <h2 class="card-pf-title">
+                      <a href="{{project | projectUrl : $ctrl.baseProjectUrl}}">
+                        {{project | displayName}}
+                      </a>
+                    </h2>
+                  </div>
+                </div>
+                <div class="card-pf-body">
+                  <quota-donut-chart
+                    chartId="{{project.metadata.name + '_cost'}}}"
+                    class="quota-dashboard-chart"
+                    quota-title="Cost"
+                    quota-icon-class="fa fa-usd"
+                    value-prefix="$"
+                    total="project.quotaData.allocated_budget"
+                    used="project.quotaData.used_budget"
+                  >
+                  </quota-donut-chart>
+                  <quota-donut-chart
+                    chartId="{{project.metadata.name + '_vms'}}}"
+                    class="quota-dashboard-chart"
+                    quota-title="VMs"
+                    quota-icon-class="pficon pficon-virtual-machine"
+                    units="Total"
+                    total="project.quotaData.allocated_vms"
+                    used="project.quotaData.used_vms"
+                  >
+                  </quota-donut-chart>
+                  <quota-donut-chart
+                    chartId="{{project.metadata.name + '_cpus'}}}"
+                    class="quota-dashboard-chart"
+                    quota-title="CPUs"
+                    quota-icon-class="pficon pficon-cpu"
+                    units="Total"
+                    total="project.quotaData.allocated_cpus"
+                    used="project.quotaData.used_cpus"
+                  >
+                  </quota-donut-chart>
+                  <quota-donut-chart
+                    chartId="{{project.metadata.name + '_memory'}}}"
+                    class="quota-dashboard-chart"
+                    quota-title="Memory"
+                    quota-icon-class="pficon pficon-memory"
+                    units="GB"
+                    total="project.quotaData.allocated_memory_gb"
+                    used="project.quotaData.used_memory_gb"
+                  >
+                  </quota-donut-chart>
+                  <quota-donut-chart
+                    chartId="{{project.metadata.name + '_storage'}}}"
+                    class="quota-dashboard-chart"
+                    quota-title="Storage"
+                    quota-icon-class="pficon pficon-storage-domain"
+                    units="GB"
+                    allowed-label="allowed_storage"
+                    allocated-label="allocated_storage"
+                    total="project.quotaData.allocated_storage_gb"
+                    used="project.quotaData.used_storage_gb"
+                  >
+                  </quota-donut-chart>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

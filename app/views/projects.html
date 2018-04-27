@@ -19,11 +19,23 @@
                 <div class="projects-bar">
                   <h1>My Projects</h1>
                   <div class="projects-options">
-                    <div class="projects-add" ng-if="canCreate">
-                      <button ng-click="createProject($event)" class="btn btn-primary">
+                    <div class="projects-add">
+                      <button  ng-if="canCreate" ng-click="createProject($event)" class="btn btn-primary">
                         <span class="fa fa-plus" aria-hidden="true"></span>
                         <span class="icon-button-text">Create Project</span>
                       </button>
+                      <div class="projects-view-select">
+                        <button class="btn btn-link" ng-class="{'active': viewType !== 'quota'}"
+                                title="List View" ng-click="setViewType('list')">
+                          <i class="fa fa-th-list" aria-hidden="true"></i>
+                          <span class="sr-only">List View</span>
+                        </button>
+                        <button class="btn btn-link" ng-class="{'active': viewType === 'quota'}"
+                                title="Quota View" ng-click="setViewType('quota')">
+                          <i class="fa fa-th" aria-hidden="true"></i>
+                          <span class="sr-only">Quota View</span>
+                        </button>
+                      </div>
                     </div>
                     <div class="projects-search">
                       <form role="form" class="search-pf has-button">
@@ -94,7 +106,7 @@
                 The current filter is hiding all projects.
                 <button type="button" class="btn btn-link inline-btn-link" ng-click="search.text = ''">Clear All Filters</button>
               </div>
-              <div ng-if="projects.length" class="list-pf list-group projects-list">
+              <div ng-if="projects.length && viewType !== 'quota'" class="list-pf list-group projects-list">
                 <div ng-repeat="project in projects | limitTo: limitListTo track by (project | uid)" class="list-pf-item list-group-item project-info tile-click">
                   <div class="list-pf-container">
                     <div class="list-pf-content list-pf-content-flex">
@@ -148,13 +160,94 @@
                             </li>
                           </ul>
                         </div>
-
                       </div>
                       <origin-modal-popup shown="editProjectPanelShown && editingProject === project"
                                           ng-class="{'with-description': (project | description | size)}"
                                           modal-title="Edit Project" on-close="closeEditProjectPanel">
                         <edit-project project="project" is-dialog="true" redirect-action="onEditProject" on-cancel="closeEditProjectPanel"></edit-project>
                       </origin-modal-popup>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div ng-if="projects.length && viewType === 'quota'" class="row row-cards-pf">
+                <div ng-repeat="project in projects | limitTo: limitListTo track by (project | uid)" class="col-xs-12 col-sm-6 col-lg-4">
+                  <div class="project-quota-card card-pf">
+                    <div class="card-pf-heading">
+                      <h2 class="card-pf-title">
+                        <a href="{{project | projectUrl : $ctrl.baseProjectUrl}}">
+                          {{project | displayName}}
+                        </a>
+                        <div class="project-actions" ng-if="project.status.phase == 'Active'">
+                          <div uib-dropdown class="dropdown pull-right dropdown-kebab-pf">
+                            <button uib-dropdown-toggle class="btn btn-link dropdown-toggle"><i class="fa fa-ellipsis-v" aria-hidden="true"></i><span class="sr-only">Actions</span></button>
+                            <ul class="dropdown-menu dropdown-menu-right" uib-dropdown-menu role="menu">
+                              <li role="menuitem">
+                                <a ng-href="project/{{project.metadata.name}}/membership">
+                                  View Membership
+                                </a>
+                              </li>
+                              <li role="menuitem">
+                                <a href="" ng-click="editProject(project)">
+                                  Edit Project
+                                </a>
+                              </li>
+                              <li role="menuitem">
+                                <delete-project
+                                  label="Delete Project"
+                                  project="project"
+                                  type-name-to-confirm="true"
+                                  stay-on-current-page="true"
+                                  success="onDeleteProject">
+                                </delete-project>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                      </h2>
+                      <origin-modal-popup shown="editProjectPanelShown && editingProject === project"
+                                          ng-class="{'with-description': (project | description | size)}"
+                                          modal-title="Edit Project" on-close="closeEditProjectPanel">
+                        <edit-project project="project" is-dialog="true" redirect-action="onEditProject" on-cancel="closeEditProjectPanel"></edit-project>
+                      </origin-modal-popup>
+                    </div>
+                    <div class="card-pf-body">
+                      <quota-utilization-bar
+                        quota-title="CPUs"
+                        quota-icon-class="pficon pficon-cpu"
+                        units="Total"
+                        project="project"
+                        allowed-label="allowed_cpu"
+                        allocated-label="allocated_cpu"
+                      >
+                      </quota-utilization-bar>
+                      <quota-utilization-bar
+                        quota-title="Memory"
+                        quota-icon-class="pficon pficon-memory"
+                        units="GB"
+                        project="project"
+                        allowed-label="allowed_memory"
+                        allocated-label="allocated_memory"
+                      >
+                      </quota-utilization-bar>
+                      <quota-utilization-bar
+                        quota-title="Storage"
+                        quota-icon-class="pficon pficon-storage-domain"
+                        units="GB"
+                        project="project"
+                        allowed-label="allowed_storage"
+                        allocated-label="allocated_storage"
+                      >
+                      </quota-utilization-bar>
+                      <quota-utilization-bar
+                        quota-title="Cost"
+                        quota-icon-class="fa fa-usd"
+                        value-prefix="$"
+                        project="project"
+                        allowed-label="allowed_cost"
+                        allocated-label="allocated_cost"
+                      >
+                      </quota-utilization-bar>
                     </div>
                   </div>
                 </div>

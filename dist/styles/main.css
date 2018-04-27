@@ -6163,6 +6163,9 @@ alerts+.chromeless .log-loading-msg{margin-top:130px}
 .projects-bar .projects-add{display:flex;justify-content:flex-end;margin:-27px 0 0}
 @media (min-width:685px){.projects-bar .projects-add{display:block;margin-bottom:20px;margin-left:40px;margin-top:0;order:2}
 }
+.projects-bar .projects-view-select{display:inline-block;margin-left:15px}
+.projects-bar .projects-view-select .btn-link{color:#252525;font-size:16px;line-height:1;padding:4px 0;margin-left:5px}
+.projects-bar .projects-view-select .btn-link.active,.projects-bar .projects-view-select .btn-link:focus,.projects-bar .projects-view-select .btn-link:hover{color:#0088ce}
 .projects-bar .projects-options{display:flex;flex-direction:column}
 .projects-bar .projects-search{display:flex;margin-bottom:20px;margin-top:20px}
 @media (min-width:685px){.projects-bar .projects-options{flex-direction:row}
@@ -6188,10 +6191,41 @@ alerts+.chromeless .log-loading-msg{margin-top:130px}
 }
 @media (min-width:992px){.projects-list .with-description .origin-modal-popup{margin-top:0}
 }
-.container-terminal-wrapper{position:relative}
 @media (min-width:768px){.projects-list .with-description .origin-modal-popup.position-above{margin-top:20px}
 .projects-list-create-popup form{width:400px}
-.container-terminal-wrapper:hover .fullscreen-toggle{display:block}
+}
+.project-quota-card .project-actions{float:right;margin-top:-5px}
+.project-quota-card .progress-description .fa,.project-quota-card .progress-description .pficon{margin-right:5px}
+.project-quota-card .progress-unavailable{text-align:center}
+.project-quota-card .quota-dashboard-chart{display:inline-block}
+.project-quota-card .quota-donut-chart-container{float:left;height:75px;position:relative;width:75px}
+.project-quota-card .quota-donut-chart-container .quota-donut-chart-title{font-size:24px;padding:15px;position:absolute;text-align:center;top:0;width:100%}
+.clickable-row{cursor:pointer}
+.pending-requests-row{width:100%}
+.order-workflow-canvas{height:100%;margin-left:25px;overflow:auto;width:100%}
+.order-workflow-canvas .canvas-in-connection-mode{background-color:#bbb;background-image:none!important;background-repeat:unset!important}
+.order-workflow-canvas .node-header{display:table;font-size:24px;margin-bottom:-10px;text-align:center;width:100%}
+.order-workflow-canvas .node-header-detail{display:table;font-size:12px;height:20px;margin-bottom:10px;text-align:center;width:100%}
+.order-workflow-canvas .node-status-icon{color:#4d5258;font-size:60px;text-align:center;width:100%}
+.order-workflow-canvas .node-info-title{margin-left:20px;margin-top:10px}
+.order-workflow-canvas .node-info-item{margin-left:30px;margin-top:5px}
+.order-workflow-canvas .node-center-icon{font-size:72px}
+.order-workflow-canvas .node-rect{fill:#fff;fill-opacity:1;stroke:#bbb;stroke-width:2}
+.order-workflow-canvas .node-icon{font-size:76px}
+.order-workflow-canvas .svg-triangle polyline{fill:#f5f5f5;stroke:#bbb;stroke-width:2}
+.order-workflow-canvas .connector-icons{cursor:pointer;fill:#0088ce;font-size:16px}
+.order-workflow-canvas .connector-icons:hover{fill:#063451}
+.order-workflow-canvas .connector-tooltip{fill:#f5f5f5;stroke-width:1;stroke:#030303}
+.order-workflow-canvas .connector-tooltip-text{font-size:10px}
+.order-workflow-canvas .connector-circle{fill:#fff;stroke-width:2;stroke:#030303}
+.order-workflow-canvas .unconnected-circle{fill:#2d7623;stroke:#030303;stroke-opacity:"0.8";stroke-width:2}
+.order-workflow-canvas .connection-line{fill:transparent;stroke-width:4;stroke:#8b8d8f}
+.order-workflow-canvas .connection-endpoint{fill:#8b8d8f;stroke:#030303;stroke-width:1}
+.order-workflow-canvas .node-chart-title,.order-workflow-canvas .node-chart-units{padding:0 10px;float:left;width:60px}
+.order-workflow-canvas .node-chart-progress{display:inline-block;float:left;width:180px}
+.order-workflow-canvas .connection-name{fill:#030303}
+.container-terminal-wrapper{position:relative}
+@media (min-width:768px){.container-terminal-wrapper:hover .fullscreen-toggle{display:block}
 }
 .container-terminal-wrapper .fullscreen-toggle .exit-fullscreen,.container-terminal-wrapper.disconnected .fullscreen-toggle{display:none}
 .container-terminal-wrapper .fullscreen-toggle{display:none;line-height:1;position:absolute;right:19px;top:0;z-index:10}

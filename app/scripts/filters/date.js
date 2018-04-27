@@ -72,6 +72,11 @@ angular.module('openshiftConsole')
       return humanizedDuration.join(", ");
     };
   })
+  .filter('momentAgo', function() {
+    return function(timestamp) {
+      return moment.utc(timestamp).utcOffset(moment().utcOffset()).fromNow();
+    };
+  })
   .filter('ageLessThan', function() {
     // ex:  amt = 5  and unit = 'minutes'
     return function(timestamp, amt, unit) {
