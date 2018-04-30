@@ -17,7 +17,7 @@ angular.module('openshiftConsole')
                                                      KeywordService,
                                                      ProjectsService) {
     var configMapsVersion = APIService.getPreferredVersion('configmaps');
-    var servicesVersion = APIService.getPreferredVersion('services');
+    var serviceInstancesVersion = APIService.getPreferredVersion('serviceinstances');
 
     var limitWatches = $filter('isIE')();
     var DEFAULT_POLL_INTERVAL = 60 * 1000; // milliseconds
@@ -78,36 +78,21 @@ angular.module('openshiftConsole')
     };
 
     var parseYAML = function(yamlData) {
-      // https://github.com/nodeca/js-yaml#safeload-string---options-
       return jsyaml.safeLoad(yamlData, {
         json: true
       });
     };
 
-    var isApprovalPending = function(approvalStatus) {
-      for (var i = 1; i <+ approvalStatus.num_approvers; i++) {
-        if (approvalStatus['approver_' + i + '_status'] === 'Pending') {
-          return true;
-        }
-      }
-      return false;
-    };
-
     var updatePendingRequests = function(project) {
-      if (!project.configMaps || !project.services) {
+      if (!project.configMaps || !project.serviceInstances) {
         return;
       }
 
       project.pendingRequestsCount = 0;
       project.pendingRequests = [];
-      _.each(project.services, function(service) {
-        var approvalMapName = service.metadata.uid + '-status';
-        var approvalStatusYAML = _.get(_.get(project.configMaps, approvalMapName), 'data.status');
-        var approvalStatus = approvalStatusYAML && parseYAML(approvalStatusYAML);
-
-        if (approvalStatus && isApprovalPending(approvalStatus)) {
+      _.each(project.serviceInstances, function(serivceInstance) {
+        if (_.get(serivceInstance, 'status.asyncOpInProgress')) {
           project.pendingRequestsCount++;
-          project.pendingRequests.push(approvalStatus);
         }
       });
     };
@@ -139,9 +124,8 @@ angular.module('openshiftConsole')
             }
           }));
 
-          // Get the services to find any that are pending approvals
-          watches.push(DataService.watch(servicesVersion, context, function(serviceData) {
-            project.services = serviceData.by("metadata.name");
+          watches.push(DataService.watch(serviceInstancesVersion, context, function(serviceInstances) {
+            project.serviceInstances = serviceInstances.by('metadata.name');
             updatePendingRequests(project);
 
             if (++servicesLoaded >= _.size($scope.projects)) {

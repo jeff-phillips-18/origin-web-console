@@ -6202,7 +6202,7 @@ alerts+.chromeless .log-loading-msg{margin-top:130px}
 .project-quota-card .quota-donut-chart-container .quota-donut-chart-title{font-size:24px;padding:15px;position:absolute;text-align:center;top:0;width:100%}
 .clickable-row{cursor:pointer}
 .pending-requests-row{width:100%}
-.order-workflow-canvas{height:100%;margin-left:25px;overflow:auto;width:100%}
+.order-workflow-canvas{height:100%;overflow:auto;padding-left:25px;width:100%}
 .order-workflow-canvas .canvas-in-connection-mode{background-color:#bbb;background-image:none!important;background-repeat:unset!important}
 .order-workflow-canvas .node-header{display:table;font-size:24px;margin-bottom:-10px;text-align:center;width:100%}
 .order-workflow-canvas .node-header-detail{display:table;font-size:12px;height:20px;margin-bottom:10px;text-align:center;width:100%}

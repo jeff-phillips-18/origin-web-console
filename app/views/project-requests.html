@@ -28,7 +28,7 @@
             <tbody ng-if="(pendingRequests | hashSize) > 0">
               <tr ng-repeat="pendingRequest in pendingRequests" ng-click="navigateTo(pendingRequest)" class="clickable-row">
                 <td data-title="Request">
-                  <span>{{pendingRequest.service | displayName}}</span>
+                  <span>{{pendingRequest.serviceInstance | displayName}}</span>
                 </td>
                 <td data-title="Requester">
                   <span>{{pendingRequest.requester}}</span>

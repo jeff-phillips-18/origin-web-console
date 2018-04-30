@@ -55,7 +55,7 @@
                   </div>
                   <div ng-if="node.nodeData('type') !== 'initial'">
                     <div class="node-header-detail" >
-                      <span ng-if="node.nodeData('status') === 'In Process'">
+                      <span ng-if="node.nodeData('status') === 'Notified'">
                         {{node.nodeData('initiatedTimestamp') | momentAgo}}
                       </span>
                     </div>
@@ -66,7 +66,7 @@
                     <div class="node-info-item">
                       {{node.nodeData('approverName')}}
                     </div>
-                    <div ng-if="node.status() !== 'Pending'">
+                    <div ng-if="node.nodeData('status') !== 'Pending' && node.nodeData('status') !== 'Skipped'">
                       <div class="node-info-title">
                         APPROVAL REQUEST TIME
                       </div>
@@ -74,13 +74,13 @@
                         {{node.nodeData('initiatedTimestamp') | date : 'medium'}}
                       </div>
                       <div class="node-info-title">
-                        APPROVED
+                        {{node.nodeData('status') === 'Denied' ? 'DENIED' : 'APPROVED'}}
                       </div>
                       <div class="node-info-item">
-                        <span ng-if="node.nodeData('status') === 'Approved'">
+                        <span ng-if="node.nodeData('status') === 'Approved' || node.nodeData('status') === 'Denied'">
                            {{node.nodeData('approvalTimestamp') | date : 'medium'}}
                         </span>
-                        <span ng-if="node.nodeData('status') === 'In Process'">
+                        <span ng-if="node.nodeData('status') === 'Notified'">
                            --
                         </span>
                       </div>

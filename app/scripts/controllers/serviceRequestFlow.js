@@ -22,7 +22,7 @@ angular.module('openshiftConsole')
                                                        Navigate,
                                                        ProjectsService) {
     var configMapsVersion = APIService.getPreferredVersion('configmaps');
-    var servicesVersion = APIService.getPreferredVersion('services');
+    var serviceInstancesVersion = APIService.getPreferredVersion('serviceinstances');
 
     var limitWatches = $filter('isIE')();
     var DEFAULT_POLL_INTERVAL = 60 * 1000; // milliseconds
@@ -38,15 +38,6 @@ angular.module('openshiftConsole')
       return jsyaml.safeLoad(yamlData, {
         json: true
       });
-    };
-
-    var nextApproverCount = function(approvalStatus) {
-      for (var i = 1; i <+ approvalStatus.num_approvers; i++) {
-        if (approvalStatus['approver_' + i + '_status'] === 'Pending') {
-          return i;
-        }
-      }
-      return 0;
     };
 
     var updatePendingRequest = function() {
@@ -67,27 +58,26 @@ angular.module('openshiftConsole')
             type: 'initial',
             status: 'Initiated',
             requester: _.get(approvalStatus, 'requester'),
-            initiatedTimestamp: parseInt(_.get($scope.service, 'metadata.creationTimestamp')),
+            initiatedTimestamp: _.get($scope.service, 'metadata.creationTimestamp'),
             width: 230,
             height: 150,
             yOffset: $scope.isMobile ? 0 : 75
           }
         );
 
-        var nextApprover = nextApproverCount(approvalStatus);
-
         for (var i = 1; i <= approvalStatus.num_approvers; i++) {
-          var status;
+          var status = _.get(approvalStatus, 'approver_' + i + '_status');
           var statusIconClass;
-          if (i < nextApprover) {
-            status = 'Approved';
+          if (status === 'Approved') {
             statusIconClass= 'pficon pficon-ok';
-          } else if (i === nextApprover) {
-            status = 'In Process';
+          } else if (status === 'Notified') {
             statusIconClass= 'fa fa-spinner';
-          } else {
-            status = 'Pending';
+          } else if (status === 'Pending') {
             statusIconClass= 'pficon pficon-pending';
+          } else if (status === 'Denied') {
+            statusIconClass= 'pficon pficon-error-circle-o';
+          } else if (status === 'Skipped') {
+            statusIconClass= 'pficon pficon-info';
           }
 
           $scope.data.nodes.push(
@@ -124,7 +114,7 @@ angular.module('openshiftConsole')
 
     var updateService = function() {
       // Get the services to find any that are pending approvals
-      watches.push(DataService.watchObject(servicesVersion, $scope.serviceName, $scope.context, function(service) {
+      watches.push(DataService.watchObject(serviceInstancesVersion, $scope.serviceName, $scope.context, function(service) {
         $scope.service = service;
         updatePendingRequest();
       }, {poll: limitWatches, pollInterval: DEFAULT_POLL_INTERVAL}));

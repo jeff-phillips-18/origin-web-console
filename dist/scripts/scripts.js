@@ -5279,16 +5279,13 @@ a.unwatchAll(u);
 });
 }));
 } ]), angular.module("openshiftConsole").controller("ServiceRequestFlowController", [ "$document", "$filter", "$location", "$scope", "$routeParams", "APIService", "AuthService", "ChartViewService", "DataService", "HTMLService", "Navigate", "ProjectsService", function(e, t, n, r, a, o, i, s, c, l, u, d) {
-var m = o.getPreferredVersion("configmaps"), p = o.getPreferredVersion("services"), f = t("isIE")(), g = [];
+var m = o.getPreferredVersion("configmaps"), p = o.getPreferredVersion("serviceinstances"), f = t("isIE")(), g = [];
 r.projectName = a.requestproject, r.serviceName = a.service, r.connectorSize = s.connectorSize;
 var v = function(e) {
 return jsyaml.safeLoad(e, {
 json: !0
 });
-}, h = function(e) {
-for (var t = 1; t < +e.num_approvers; t++) if ("Pending" === e["approver_" + t + "_status"]) return t;
-return 0;
-}, y = function() {
+}, h = function() {
 var e = r.service.metadata.uid + "-status";
 g.push(c.watchObject(m, e, r.context, function(e) {
 var t = _.get(e, "data.status"), n = t && v(t);
@@ -5300,80 +5297,87 @@ id: 1,
 type: "initial",
 status: "Initiated",
 requester: _.get(n, "requester"),
-initiatedTimestamp: parseInt(_.get(r.service, "metadata.creationTimestamp")),
+initiatedTimestamp: _.get(r.service, "metadata.creationTimestamp"),
 width: 230,
 height: 150,
 yOffset: r.isMobile ? 0 : 75
 });
-for (var a = h(n), o = 1; o <= n.num_approvers; o++) {
-var i, c;
-o < a ? (i = "Approved", c = "pficon pficon-ok") : o === a ? (i = "In Process", c = "fa fa-spinner") : (i = "Pending", c = "pficon pficon-pending"), r.data.nodes.push({
-id: o + 1,
-parentId: r.isMobile ? void 0 : o,
-prevSiblingId: r.isMobile ? o : void 0,
+for (var a = 1; a <= n.num_approvers; a++) {
+var o, i = _.get(n, "approver_" + a + "_status");
+"Approved" === i ? o = "pficon pficon-ok" : "Notified" === i ? o = "fa fa-spinner" : "Pending" === i ? o = "pficon pficon-pending" : "Denied" === i ? o = "pficon pficon-error-circle-o" : "Skipped" === i && (o = "pficon pficon-info"), r.data.nodes.push({
+id: a + 1,
+parentId: r.isMobile ? void 0 : a,
+prevSiblingId: r.isMobile ? a : void 0,
 type: "approval",
 status: i,
-statusIconClass: c,
-approverName: _.get(n, "approver_" + o + "_name"),
-approverUrl: _.get(n, "approver_" + o + "_url"),
-initiatedTimestamp: parseInt(_.get(n, "approver_" + o + "_initiated_at")),
-approvalTimestamp: parseInt(_.get(n, "approver_" + o + "_approved_at")),
+statusIconClass: o,
+approverName: _.get(n, "approver_" + a + "_name"),
+approverUrl: _.get(n, "approver_" + a + "_url"),
+initiatedTimestamp: parseInt(_.get(n, "approver_" + a + "_initiated_at")),
+approvalTimestamp: parseInt(_.get(n, "approver_" + a + "_approved_at")),
 xOffset: r.isMobile ? 25 : 0
 }), r.data.connections.push({
 source: {
-nodeID: o,
+nodeID: a,
 connectorIndex: r.isMobile ? 1 : 0
 },
 dest: {
-nodeID: o + 1,
+nodeID: a + 1,
 connectorIndex: r.isMobile ? 1 : 0
 }
 });
 }
 r.chart = s.createChartViewModel(r.data), r.loading = !1;
 }));
-}, b = function() {
+}, y = function() {
 g.push(c.watchObject(p, r.serviceName, r.context, function(e) {
-r.service = e, y();
+r.service = e, h();
 }, {
 poll: f,
 pollInterval: 6e4
 }));
 };
 r.foreignObjectSupported = e[0].implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#Extensibility", "1.1"), r.loading = !0, d.get(r.projectName).then(_.spread(function(e, t) {
-r.project = e, r.context = t, b();
+r.project = e, r.context = t, y();
 }, function(e) {
 u.toProjectList();
 }));
-var S = function() {
+var b = function() {
 return l.isWindowBelowBreakpoint(l.WINDOW_SIZE_SM);
 };
-r.isMobile = S();
-var C = _.throttle(function() {
-var e = S();
+r.isMobile = b();
+var S = _.throttle(function() {
+var e = b();
 e !== r.isMobile && r.$evalAsync(function() {
-r.isMobile = e, y();
+r.isMobile = e, h();
 });
 }, 50);
-$(window).on("resize.workflow", C), r.$on("$destroy", function() {
+$(window).on("resize.workflow", S), r.$on("$destroy", function() {
 c.unwatchAll(g), $(window).off(".workflow");
 });
 } ]), angular.module("openshiftConsole").controller("ProjectRequestsController", [ "$filter", "$location", "$scope", "$routeParams", "APIService", "AuthService", "DataService", "HomePagePreferenceService", "KeywordService", "Navigate", "ProjectsService", function(e, t, n, r, a, o, i, s, c, l, u) {
-var d, m, p = a.getPreferredVersion("configmaps"), f = a.getPreferredVersion("services"), g = e("isIE")(), v = [];
+var d, m, p = a.getPreferredVersion("configmaps"), f = a.getPreferredVersion("serviceinstances"), g = e("isIE")(), v = [];
 n.projectName = r.requestproject, n.pendingRequests = [], n.navigateTo = function(e) {
-t.url("quotas/requests/" + n.projectName + "/" + e.service.metadata.name);
+t.url("quotas/requests/" + n.projectName + "/" + e.serviceInstance.metadata.name);
 };
 var h = function(e) {
 return jsyaml.safeLoad(e, {
 json: !0
 });
 }, y = function(e) {
-for (var t = 1; t < +e.num_approvers; t++) if ("Pending" === e["approver_" + t + "_status"]) return t;
+for (var t = 1; t <= e.num_approvers; t++) if ("Notified" === e["approver_" + t + "_status"]) return t;
 return 0;
 }, b = function() {
 d && m && (n.pendingRequests = [], _.each(m, function(e) {
-var t = e.metadata.uid + "-status", r = _.get(_.get(d, t), "data.status"), a = r && h(r), o = y(a);
-a && o && (a.service = e, a.requestTimestamp = _.get(e, "metadata.creationTimestamp"), a.approvalStatus = "Step " + o + " of " + a.num_approvers, a.approver = a["approver_" + o + "_name"], a.approvalRequestTimestamp = a["approver_" + o + "_initiated_at"], n.pendingRequests.push(a));
+if (_.get(e, "status.asyncOpInProgress")) {
+var t = e.metadata.uid + "-status", r = _.get(_.get(d, t), "data.status"), a = {};
+if (r) {
+(a = h(r)).serviceInstance = e;
+var o = y(a);
+a && o && (a.requestTimestamp = _.get(e, "metadata.creationTimestamp"), a.approvalStatus = "Step " + o + " of " + a.num_approvers, a.approver = a["approver_" + o + "_name"], a.approvalRequestTimestamp = a["approver_" + o + "_initiated_at"]);
+} else a.serviceInstance = e, a.requester = "unknown";
+n.pendingRequests.push(a);
+}
 }));
 }, S = function() {
 var e = !0, t = !0;
@@ -5394,7 +5398,7 @@ l.toProjectList();
 i.unwatchAll(v);
 });
 } ]), angular.module("openshiftConsole").controller("QuotasDashboardController", [ "$filter", "$scope", "APIService", "AuthService", "DataService", "KeywordService", "ProjectsService", function(e, t, n, r, a, o, i) {
-var s, c, l, u = n.getPreferredVersion("configmaps"), d = n.getPreferredVersion("services"), m = e("isIE")(), p = [], f = [], g = [ "metadata.name", 'metadata.annotations["openshift.io/display-name"]', 'metadata.annotations["openshift.io/description"]', 'metadata.annotations["openshift.io/requester"]' ], v = function() {
+var s, c, l, u = n.getPreferredVersion("configmaps"), d = n.getPreferredVersion("serviceinstances"), m = e("isIE")(), p = [], f = [], g = [ "metadata.name", 'metadata.annotations["openshift.io/display-name"]', 'metadata.annotations["openshift.io/description"]', 'metadata.annotations["openshift.io/requester"]' ], v = function() {
 t.projects = o.filterForKeywords(c, g, f);
 }, h = e("displayName"), y = function() {
 var e = _.get(t, "sortConfig.currentField.id");
@@ -5420,14 +5424,10 @@ return jsyaml.safeLoad(e, {
 json: !0
 });
 }, S = function(e) {
-for (var t = 1; t < +e.num_approvers; t++) if ("Pending" === e["approver_" + t + "_status"]) return !0;
-return !1;
-}, C = function(e) {
-e.configMaps && e.services && (e.pendingRequestsCount = 0, e.pendingRequests = [], _.each(e.services, function(t) {
-var n = t.metadata.uid + "-status", r = _.get(_.get(e.configMaps, n), "data.status"), a = r && b(r);
-a && S(a) && (e.pendingRequestsCount++, e.pendingRequests.push(a));
+e.configMaps && e.serviceInstances && (e.pendingRequestsCount = 0, e.pendingRequests = [], _.each(e.serviceInstances, function(t) {
+_.get(t, "status.asyncOpInProgress") && e.pendingRequestsCount++;
 }));
-}, w = function() {
+}, C = function() {
 if (s) {
 y(), v();
 var e = !0, n = !0, r = 0, o = 0;
@@ -5436,9 +5436,9 @@ var s = {
 namespace: i.metadata.name
 };
 p.push(a.watch(u, s, function(a) {
-i.configMaps = a.by("metadata.name"), i.quotaData = b(_.get(i.configMaps, "redhat-quota.data.quota")), C(i), ++r >= _.size(t.projects) && (e = !1, t.loading = t.loading && (n || e));
+i.configMaps = a.by("metadata.name"), i.quotaData = b(_.get(i.configMaps, "redhat-quota.data.quota")), S(i), ++r >= _.size(t.projects) && (e = !1, t.loading = t.loading && (n || e));
 })), p.push(a.watch(d, s, function(r) {
-i.services = r.by("metadata.name"), C(i), ++o >= _.size(t.projects) && (n = !1, t.loading = t.loading && (n || e));
+i.serviceInstances = r.by("metadata.name"), S(i), ++o >= _.size(t.projects) && (n = !1, t.loading = t.loading && (n || e));
 }, {
 poll: m,
 pollInterval: 6e4
@@ -5465,15 +5465,15 @@ title: "Creation Date",
 sortType: "alpha"
 } ],
 isAscending: !0,
-onSortChange: w
+onSortChange: C
 };
-var P = function(e) {
-s = _.toArray(e.by("metadata.name")), w();
+var w = function(e) {
+s = _.toArray(e.by("metadata.name")), C();
 };
 t.$watch("search.text", _.debounce(function(e) {
 t.keywords = f = o.generateKeywords(e), t.$applyAsync(v);
 }, 350)), t.loading = !0, p.push(i.watch(t, function(e) {
-P(e);
+w(e);
 })), t.$on("$destroy", function() {
 a.unwatchAll(p);
 });

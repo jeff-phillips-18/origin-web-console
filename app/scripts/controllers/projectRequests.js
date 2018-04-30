@@ -21,19 +21,20 @@ angular.module('openshiftConsole')
                                                     Navigate,
                                                     ProjectsService) {
     var configMapsVersion = APIService.getPreferredVersion('configmaps');
-    var servicesVersion = APIService.getPreferredVersion('services');
+    var serviceInstancesVersion = APIService.getPreferredVersion('serviceinstances');
 
     var limitWatches = $filter('isIE')();
     var DEFAULT_POLL_INTERVAL = 60 * 1000; // milliseconds
 
     var watches = [];
-    var configMaps, services;
+    var configMaps;
+    var serivceInstances;
 
     $scope.projectName = $routeParams.requestproject;
     $scope.pendingRequests = [];
 
     $scope.navigateTo = function(request) {
-      $location.url('quotas/requests/' + $scope.projectName + '/' + request.service.metadata.name);
+      $location.url('quotas/requests/' + $scope.projectName + '/' + request.serviceInstance.metadata.name);
     };
 
     var parseYAML = function(yamlData) {
@@ -43,8 +44,8 @@ angular.module('openshiftConsole')
     };
 
     var nextApproverCount = function(approvalStatus) {
-      for (var i = 1; i <+ approvalStatus.num_approvers; i++) {
-        if (approvalStatus['approver_' + i + '_status'] === 'Pending') {
+      for (var i = 1; i <= approvalStatus.num_approvers; i++) {
+        if (approvalStatus['approver_' + i + '_status'] === 'Notified') {
           return i;
         }
       }
@@ -52,22 +53,31 @@ angular.module('openshiftConsole')
     };
 
     var updatePendingRequests = function() {
-      if (!configMaps || !services) {
+      if (!configMaps || !serivceInstances) {
         return;
       }
 
       $scope.pendingRequests = [];
-      _.each(services, function(service) {
-        var approvalMapName = service.metadata.uid + '-status';
-        var approvalStatusYAML = _.get(_.get(configMaps, approvalMapName), 'data.status');
-        var approvalStatus = approvalStatusYAML && parseYAML(approvalStatusYAML);
-        var nextApprover = nextApproverCount(approvalStatus);
-        if (approvalStatus && nextApprover) {
-          approvalStatus.service = service;
-          approvalStatus.requestTimestamp = _.get(service, 'metadata.creationTimestamp');
-          approvalStatus.approvalStatus = 'Step ' + nextApprover + ' of ' + approvalStatus.num_approvers;
-          approvalStatus.approver = approvalStatus['approver_' + nextApprover + '_name'];
-          approvalStatus.approvalRequestTimestamp = approvalStatus['approver_' + nextApprover + '_initiated_at'];
+      _.each(serivceInstances, function(serviceInstance) {
+        if (_.get(serviceInstance, 'status.asyncOpInProgress')) {
+          var approvalMapName = serviceInstance.metadata.uid + '-status';
+          var approvalStatusYAML = _.get(_.get(configMaps, approvalMapName), 'data.status');
+          var approvalStatus = {};
+          if (approvalStatusYAML) {
+            approvalStatus = parseYAML(approvalStatusYAML);
+            approvalStatus.serviceInstance = serviceInstance;
+
+            var nextApprover = nextApproverCount(approvalStatus);
+            if (approvalStatus && nextApprover) {
+              approvalStatus.requestTimestamp = _.get(serviceInstance, 'metadata.creationTimestamp');
+              approvalStatus.approvalStatus = 'Step ' + nextApprover + ' of ' + approvalStatus.num_approvers;
+              approvalStatus.approver = approvalStatus['approver_' + nextApprover + '_name'];
+              approvalStatus.approvalRequestTimestamp = approvalStatus['approver_' + nextApprover + '_initiated_at'];
+            }
+          } else {
+            approvalStatus.serviceInstance = serviceInstance;
+            approvalStatus.requester = "unknown";
+          }
           $scope.pendingRequests.push(approvalStatus);
         }
       });
@@ -90,8 +100,8 @@ angular.module('openshiftConsole')
       ));
 
       // Get the services to find any that are pending approvals
-      watches.push(DataService.watch(servicesVersion, $scope.context, function(serviceData) {
-        services = serviceData.by("metadata.name");
+      watches.push(DataService.watch(serviceInstancesVersion, $scope.context, function (serviceInstancesData) {
+        serivceInstances = serviceInstancesData.by("metadata.name");
         updatePendingRequests();
 
         servicesLoading = false;

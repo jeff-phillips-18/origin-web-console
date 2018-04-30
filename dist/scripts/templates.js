@@ -13336,7 +13336,7 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "<tbody ng-if=\"(pendingRequests | hashSize) > 0\">\n" +
     "<tr ng-repeat=\"pendingRequest in pendingRequests\" ng-click=\"navigateTo(pendingRequest)\" class=\"clickable-row\">\n" +
     "<td data-title=\"Request\">\n" +
-    "<span>{{pendingRequest.service | displayName}}</span>\n" +
+    "<span>{{pendingRequest.serviceInstance | displayName}}</span>\n" +
     "</td>\n" +
     "<td data-title=\"Requester\">\n" +
     "<span>{{pendingRequest.requester}}</span>\n" +
@@ -14121,7 +14121,7 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "</div>\n" +
     "<div ng-if=\"node.nodeData('type') !== 'initial'\">\n" +
     "<div class=\"node-header-detail\">\n" +
-    "<span ng-if=\"node.nodeData('status') === 'In Process'\">\n" +
+    "<span ng-if=\"node.nodeData('status') === 'Notified'\">\n" +
     "{{node.nodeData('initiatedTimestamp') | momentAgo}}\n" +
     "</span>\n" +
     "</div>\n" +
@@ -14132,7 +14132,7 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "<div class=\"node-info-item\">\n" +
     "{{node.nodeData('approverName')}}\n" +
     "</div>\n" +
-    "<div ng-if=\"node.status() !== 'Pending'\">\n" +
+    "<div ng-if=\"node.nodeData('status') !== 'Pending' && node.nodeData('status') !== 'Skipped'\">\n" +
     "<div class=\"node-info-title\">\n" +
     "APPROVAL REQUEST TIME\n" +
     "</div>\n" +
@@ -14140,13 +14140,13 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "{{node.nodeData('initiatedTimestamp') | date : 'medium'}}\n" +
     "</div>\n" +
     "<div class=\"node-info-title\">\n" +
-    "APPROVED\n" +
+    "{{node.nodeData('status') === 'Denied' ? 'DENIED' : 'APPROVED'}}\n" +
     "</div>\n" +
     "<div class=\"node-info-item\">\n" +
-    "<span ng-if=\"node.nodeData('status') === 'Approved'\">\n" +
+    "<span ng-if=\"node.nodeData('status') === 'Approved' || node.nodeData('status') === 'Denied'\">\n" +
     "{{node.nodeData('approvalTimestamp') | date : 'medium'}}\n" +
     "</span>\n" +
-    "<span ng-if=\"node.nodeData('status') === 'In Process'\">\n" +
+    "<span ng-if=\"node.nodeData('status') === 'Notified'\">\n" +
     "--\n" +
     "</span>\n" +
     "</div>\n" +
