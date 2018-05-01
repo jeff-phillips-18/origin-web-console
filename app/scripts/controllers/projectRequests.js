@@ -20,6 +20,8 @@ angular.module('openshiftConsole')
                                                     KeywordService,
                                                     Navigate,
                                                     ProjectsService) {
+    var debug = false;
+
     var configMapsVersion = APIService.getPreferredVersion('configmaps');
     var serviceInstancesVersion = APIService.getPreferredVersion('serviceinstances');
 
@@ -28,7 +30,7 @@ angular.module('openshiftConsole')
 
     var watches = [];
     var configMaps;
-    var serivceInstances;
+    var serviceInstances;
 
     $scope.projectName = $routeParams.requestproject;
     $scope.pendingRequests = [];
@@ -52,14 +54,35 @@ angular.module('openshiftConsole')
       return 0;
     };
 
+    var hasPendingConfigMap = function(serviceInstance) {
+      if (!debug) {
+        return false;
+      }
+
+      var hasPendingApprover = function(approvalStatus) {
+        for (var i = 1; i <= approvalStatus.num_approvers; i++) {
+          var status = approvalStatus['approver_' + i + '_status'];
+          if (status === 'Notified' ||status === 'Pending') {
+            return true;
+          }
+        }
+        return false;
+      };
+
+      var approvalMapName = serviceInstance.metadata.uid + '-status';
+      var approvalStatusYAML = _.get(_.get(configMaps, approvalMapName), 'data.status');
+
+      return approvalStatusYAML && hasPendingApprover(parseYAML(approvalStatusYAML));
+    };
+
     var updatePendingRequests = function() {
-      if (!configMaps || !serivceInstances) {
+      if (!configMaps || !serviceInstances) {
         return;
       }
 
       $scope.pendingRequests = [];
-      _.each(serivceInstances, function(serviceInstance) {
-        if (_.get(serviceInstance, 'status.asyncOpInProgress')) {
+      _.each(serviceInstances, function(serviceInstance) {
+        if (_.get(serviceInstance, 'status.asyncOpInProgress') || hasPendingConfigMap(serviceInstance)) {
           var approvalMapName = serviceInstance.metadata.uid + '-status';
           var approvalStatusYAML = _.get(_.get(configMaps, approvalMapName), 'data.status');
           var approvalStatus = {};
@@ -101,7 +124,8 @@ angular.module('openshiftConsole')
 
       // Get the services to find any that are pending approvals
       watches.push(DataService.watch(serviceInstancesVersion, $scope.context, function (serviceInstancesData) {
-        serivceInstances = serviceInstancesData.by("metadata.name");
+        serviceInstances = _.sortBy(serviceInstancesData.by("metadata.name"), "metadata.creationTimestamp");
+
         updatePendingRequests();
 
         servicesLoading = false;

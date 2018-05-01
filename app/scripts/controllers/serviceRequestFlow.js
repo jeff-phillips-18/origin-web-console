@@ -56,43 +56,56 @@ angular.module('openshiftConsole')
           {
             id: 1,
             type: 'initial',
-            status: 'Initiated',
-            requester: _.get(approvalStatus, 'requester'),
+            title: 'Request Initiated',
+            statusIconClass: 'pficon pficon-add-circle-o',
+           requester: _.get(approvalStatus, 'requester'),
             initiatedTimestamp: _.get($scope.service, 'metadata.creationTimestamp'),
             width: 230,
-            height: 150,
-            yOffset: $scope.isMobile ? 0 : 75
+            height: 250,
+            yOffset: $scope.isMobile ? 0 : 25
           }
         );
 
         for (var i = 1; i <= approvalStatus.num_approvers; i++) {
           var status = _.get(approvalStatus, 'approver_' + i + '_status');
           var statusIconClass;
+          var connectorClass;
+          var sourceConnectorClass;
+          var title = status;
           if (status === 'Approved') {
-            statusIconClass= 'pficon pficon-ok';
+            statusIconClass = 'pficon pficon-orders';
+            sourceConnectorClass = 'approved';
+            connectorClass = 'approved';
           } else if (status === 'Notified') {
-            statusIconClass= 'fa fa-spinner';
+            title = 'In Progress';
+            statusIconClass = 'fa fa-spinner';
+            connectorClass = 'in-progress';
           } else if (status === 'Pending') {
-            statusIconClass= 'pficon pficon-pending';
+            statusIconClass = 'pficon pficon-pending';
+            connectorClass = 'pending';
           } else if (status === 'Denied') {
-            statusIconClass= 'pficon pficon-error-circle-o';
+            statusIconClass = 'pficon pficon-error-circle-o';
+            connectorClass = 'denied';
           } else if (status === 'Skipped') {
-            statusIconClass= 'pficon pficon-info';
+            statusIconClass= 'fa fa-step-forward';
+            connectorClass = 'skipped';
           }
 
           $scope.data.nodes.push(
             {
               id: i + 1,
+              type: status,
+              title: title,
               parentId: $scope.isMobile ? undefined : i,
               prevSiblingId: $scope.isMobile ? i : undefined,
-              type: 'approval',
               status: status,
               statusIconClass: statusIconClass,
               approverName: _.get(approvalStatus, 'approver_' + i + '_name'),
               approverUrl: _.get(approvalStatus, 'approver_' + i + '_url'),
               initiatedTimestamp: parseInt(_.get(approvalStatus, 'approver_' + i + '_initiated_at')),
               approvalTimestamp: parseInt(_.get(approvalStatus, 'approver_' + i + '_approved_at')),
-              xOffset: $scope.isMobile ? 25 : 0
+              width: 230,
+              height: 300
             });
             $scope.data.connections.push(
               {
@@ -102,7 +115,8 @@ angular.module('openshiftConsole')
                 },
                 dest: {
                   nodeID: i + 1,
-                  connectorIndex:  $scope.isMobile ? 1 : 0
+                  connectorIndex:  $scope.isMobile ? 1 : 0,
+                  connectorClass: connectorClass
                 }
               }
             );

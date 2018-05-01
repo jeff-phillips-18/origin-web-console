@@ -1,57 +1,60 @@
-<div class="middle surface-shaded">
-  <div class="middle">
-    <div class="middle-header">
-      <div class="container-fluid">
-        <ol class="breadcrumb">
-          <li class="active">
-            <a href="{{project | projectUrl : $ctrl.baseProjectUrl}}">{{project | displayName}}</a>
-          </li>
-          <li>
-            <strong>Pending Requests</strong>
-          </li>
-        </ol>
-        <div>
-          <table class="table table-bordered table-mobile">
-            <thead>
-              <tr>
-                <th>Request</th>
-                <th>Requester</th>
-                <th>Request Date</th>
-                <th>Approval Status</th>
-                <th>Pending Approver</th>
-                <th>Approval Request</th>
-              </tr>
-            </thead>
-            <tbody ng-if="(pendingRequests | hashSize) == 0">
-              <tr><td colspan="4"><em>There are no pending requests</em></td></tr>
-            </tbody>
-            <tbody ng-if="(pendingRequests | hashSize) > 0">
-              <tr ng-repeat="pendingRequest in pendingRequests" ng-click="navigateTo(pendingRequest)" class="clickable-row">
-                <td data-title="Request">
-                  <span>{{pendingRequest.serviceInstance | displayName}}</span>
-                </td>
-                <td data-title="Requester">
-                  <span>{{pendingRequest.requester}}</span>
-                </td>
-                <td data-title="Request Date">
-                  <span class="date">{{pendingRequest.requestTimestamp | date:'shortDate'}}</span>
-                  <span class="time">{{pendingRequest.requestTimestamp | date:'mediumTime'}}</span>
-                </td>
+<div class="middle">
+  <div class="middle-header">
+    <div class="container-fluid">
+      <ol class="breadcrumb">
+        <li class="active">
+          <a href="quotas/">Project Quotas</a>
+        </li>
+        <li class="active">
+          <a href="{{project | projectUrl : $ctrl.baseProjectUrl}}">{{project | displayName}}</a>
+        </li>
+        <li>
+          <strong>Pending Requests</strong>
+        </li>
+      </ol>
+    </div>
+  </div>
+  <div class="middle-content order-workflow-container">
+    <div>
+      <table class="table dataTable table-striped table-bordered table-mobile table-layout-fixed">
+        <thead>
+          <tr>
+            <th>Request</th>
+            <th>Requester</th>
+            <th class="sorting_asc">Request Date</th>
+            <th>Approval Status</th>
+            <th>Pending Approver</th>
+            <th>Approval Request</th>
+          </tr>
+        </thead>
+        <tbody ng-if="(pendingRequests | hashSize) == 0">
+          <tr><td colspan="4"><em>There are no pending requests</em></td></tr>
+        </tbody>
+        <tbody ng-if="(pendingRequests | hashSize) > 0">
+          <tr ng-repeat="pendingRequest in pendingRequests track by $index" ng-click="navigateTo(pendingRequest)" class="clickable-row">
+            <td data-title="Request">
+              <span>{{pendingRequest.serviceInstance | displayName}}</span>
+            </td>
+            <td data-title="Requester">
+              <span>{{pendingRequest.requester}}</span>
+            </td>
+            <td data-title="Request Date">
+              <span class="date">{{pendingRequest.requestTimestamp | date:'shortDate'}}</span>
+              <span class="time">{{pendingRequest.requestTimestamp | date:'mediumTime'}}</span>
+            </td>
 
-                <td data-title="Approval Status">
-                  <span>{{pendingRequest.approvalStatus}}</span>
-                </td>
-                <td data-title="Pending Approver">
-                  <span>{{pendingRequest.approver}}</span>
-                </td>
-                <td data-title="Approval Request">
-                  <span am-time-ago="pendingRequest.approvalRequestTimestamp"></span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+            <td data-title="Approval Status">
+              <span>{{pendingRequest.approvalStatus}}</span>
+            </td>
+            <td data-title="Pending Approver">
+              <span>{{pendingRequest.approver}}</span>
+            </td>
+            <td data-title="Approval Request">
+              <span am-time-ago="pendingRequest.approvalRequestTimestamp"></span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>

@@ -7368,7 +7368,7 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "<option value=\"catalog\">Service Catalog</option>\n" +
     "<option value=\"application-console\">Application Console</option>\n" +
     "<option ng-if=\"clusterConsoleURL\" value=\"cluster-console\">Cluster Console</option>\n" +
-    "<option value=\"quota-dashboard\">Quota Dashboard</option>\n" +
+    "<option value=\"quota-dashboard\">Project Quotas</option>\n" +
     "</select>\n" +
     "</div>\n" +
     "<navbar-utility></navbar-utility>\n" +
@@ -13306,11 +13306,13 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
 
 
   $templateCache.put('views/project-requests.html',
-    "<div class=\"middle surface-shaded\">\n" +
     "<div class=\"middle\">\n" +
     "<div class=\"middle-header\">\n" +
     "<div class=\"container-fluid\">\n" +
     "<ol class=\"breadcrumb\">\n" +
+    "<li class=\"active\">\n" +
+    "<a href=\"quotas/\">Project Quotas</a>\n" +
+    "</li>\n" +
     "<li class=\"active\">\n" +
     "<a href=\"{{project | projectUrl : $ctrl.baseProjectUrl}}\">{{project | displayName}}</a>\n" +
     "</li>\n" +
@@ -13318,13 +13320,16 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "<strong>Pending Requests</strong>\n" +
     "</li>\n" +
     "</ol>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "<div class=\"middle-content order-workflow-container\">\n" +
     "<div>\n" +
-    "<table class=\"table table-bordered table-mobile\">\n" +
+    "<table class=\"table dataTable table-striped table-bordered table-mobile table-layout-fixed\">\n" +
     "<thead>\n" +
     "<tr>\n" +
     "<th>Request</th>\n" +
     "<th>Requester</th>\n" +
-    "<th>Request Date</th>\n" +
+    "<th class=\"sorting_asc\">Request Date</th>\n" +
     "<th>Approval Status</th>\n" +
     "<th>Pending Approver</th>\n" +
     "<th>Approval Request</th>\n" +
@@ -13334,7 +13339,7 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "<tr><td colspan=\"4\"><em>There are no pending requests</em></td></tr>\n" +
     "</tbody>\n" +
     "<tbody ng-if=\"(pendingRequests | hashSize) > 0\">\n" +
-    "<tr ng-repeat=\"pendingRequest in pendingRequests\" ng-click=\"navigateTo(pendingRequest)\" class=\"clickable-row\">\n" +
+    "<tr ng-repeat=\"pendingRequest in pendingRequests track by $index\" ng-click=\"navigateTo(pendingRequest)\" class=\"clickable-row\">\n" +
     "<td data-title=\"Request\">\n" +
     "<span>{{pendingRequest.serviceInstance | displayName}}</span>\n" +
     "</td>\n" +
@@ -13357,8 +13362,6 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "</tr>\n" +
     "</tbody>\n" +
     "</table>\n" +
-    "</div>\n" +
-    "</div>\n" +
     "</div>\n" +
     "</div>\n" +
     "</div>"
@@ -13825,14 +13828,11 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
 
 
   $templateCache.put('views/quotas-dashboard.html',
-    "<div class=\"qumiddle surface-shaded\">\n" +
-    "<div class=\"middle-content\">\n" +
+    "<div class=\"middle\">\n" +
     "<div class=\"container-fluid\">\n" +
-    "<div class=\"row\">\n" +
-    "<div class=\"col-md-12\">\n" +
     "<div class=\"projects-header\">\n" +
     "<div class=\"projects-bar\">\n" +
-    "<h1>Quota Dashboard - {{user.fullName || user.metadata.name}}</h1>\n" +
+    "<h1>Project Quotas</h1>\n" +
     "<div class=\"projects-options\">\n" +
     "<div class=\"projects-search\">\n" +
     "<form role=\"form\" class=\"search-pf has-button\">\n" +
@@ -13855,6 +13855,11 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "</div>\n" +
     "</div>\n" +
     "</div>\n" +
+    "</div>\n" +
+    "<div class=\"middle-content surface-shaded quota-dashboard-container\">\n" +
+    "<div class=\"container-fluid\">\n" +
+    "<div class=\"row\">\n" +
+    "<div class=\"col-md-12\">\n" +
     "<div ng-if=\"loading\" class=\"empty-state-message\">\n" +
     "<h2 class=\"text-center\">Loading...</h2>\n" +
     "</div>\n" +
@@ -14076,11 +14081,13 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
 
 
   $templateCache.put('views/service-request-flow.html',
-    "<div class=\"middle surface-shaded\">\n" +
     "<div class=\"middle\">\n" +
     "<div class=\"middle-header\">\n" +
     "<div class=\"container-fluid\">\n" +
     "<ol class=\"breadcrumb\">\n" +
+    "<li class=\"active\">\n" +
+    "<a href=\"quotas/\">Project Quotas</a>\n" +
+    "</li>\n" +
     "<li class=\"active\">\n" +
     "<a href=\"{{project | projectUrl : baseProjectUrl}}\">{{project | displayName}}</a>\n" +
     "</li>\n" +
@@ -14093,9 +14100,7 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "</ol>\n" +
     "</div>\n" +
     "</div>\n" +
-    "<div class=\"middle-content\">\n" +
-    "<div class=\"container-fluid\">\n" +
-    "<div class=\"order-workflow-canvas\">\n" +
+    "<div class=\"middle-content order-workflow-container shaded\">\n" +
     "<svg class=\"read-only\" xmlns=\"http://www.w3.org/2000/svg\" ng-attr-width=\"{{chart.width}}\" ng-attr-height=\"{{chart.height}}\">\n" +
     "<g>\n" +
     "\n" +
@@ -14104,51 +14109,61 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "<rect class=\"node-rect\" ry=\"0\" rx=\"0\" ng-attr-x=\"{{node.xOffset()}}\" ng-attr-y=\"{{node.yOffset()}}\" ng-attr-width=\"{{node.width()}}\" ng-attr-height=\"{{node.height()}}\">\n" +
     "</rect>\n" +
     "\n" +
-    "<foreignobject ng-attr-x=\"{{node.xOffset()}}\" ng-attr-y=\"{{node.yOffset()}}\" ng-attr-width=\"{{node.width()}}\">\n" +
+    "<foreignobject ng-attr-x=\"{{node.xOffset()}}\" ng-attr-y=\"{{node.yOffset()}}\" ng-attr-width=\"{{node.width()}}\" ng-attr-height=\"{{node.height()}}\">\n" +
+    "<div class=\"node-card card-pf\" ng-class=\"{'card-pf-accented': node.nodeData('type') === 'Notified'}\">\n" +
+    "<div class=\"card-pf-body\">\n" +
+    "<div class=\"node-status-icon {{node.nodeData('statusIconClass')}}\"></div>\n" +
     "<span class=\"node-header\">\n" +
-    "{{node.nodeData('status')}}\n" +
+    "{{node.nodeData('title')}}\n" +
     "</span>\n" +
     "<div ng-if=\"node.nodeData('type') === 'initial'\">\n" +
     "<div class=\"node-header-detail\">\n" +
     "{{service | displayName}}\n" +
     "</div>\n" +
-    "<div class=\"node-info-item\">\n" +
-    "by {{node.nodeData('requester')}}\n" +
+    "<div class=\"node-info-title\">\n" +
+    "Requester\n" +
     "</div>\n" +
     "<div class=\"node-info-item\">\n" +
-    "at {{node.nodeData('initiatedTimestamp') | date : 'medium'}}\n" +
+    "{{node.nodeData('requester')}}\n" +
+    "</div>\n" +
+    "<div class=\"node-info-title\">\n" +
+    "Request Time\n" +
+    "</div>\n" +
+    "<div class=\"node-info-item\">\n" +
+    "{{node.nodeData('initiatedTimestamp') | date : 'medium'}}\n" +
     "</div>\n" +
     "</div>\n" +
     "<div ng-if=\"node.nodeData('type') !== 'initial'\">\n" +
     "<div class=\"node-header-detail\">\n" +
-    "<span ng-if=\"node.nodeData('status') === 'Notified'\">\n" +
+    "<span ng-if=\"node.nodeData('type') === 'Notified'\">\n" +
     "{{node.nodeData('initiatedTimestamp') | momentAgo}}\n" +
     "</span>\n" +
     "</div>\n" +
-    "<div class=\"node-status-icon {{node.nodeData('statusIconClass')}}\"></div>\n" +
     "<div class=\"node-info-title\">\n" +
-    "APPROVER NAME\n" +
+    "Approver Name\n" +
     "</div>\n" +
     "<div class=\"node-info-item\">\n" +
     "{{node.nodeData('approverName')}}\n" +
     "</div>\n" +
-    "<div ng-if=\"node.nodeData('status') !== 'Pending' && node.nodeData('status') !== 'Skipped'\">\n" +
+    "<div ng-if=\"node.nodeData('type') !== 'Pending' && node.nodeData('type') !== 'Skipped'\">\n" +
     "<div class=\"node-info-title\">\n" +
-    "APPROVAL REQUEST TIME\n" +
+    "Approval Request Time\n" +
     "</div>\n" +
     "<div class=\"node-info-item\">\n" +
     "{{node.nodeData('initiatedTimestamp') | date : 'medium'}}\n" +
     "</div>\n" +
     "<div class=\"node-info-title\">\n" +
-    "{{node.nodeData('status') === 'Denied' ? 'DENIED' : 'APPROVED'}}\n" +
+    "{{node.nodeData('type') === 'Denied' ? 'Denied' : 'Approved'}}\n" +
     "</div>\n" +
     "<div class=\"node-info-item\">\n" +
-    "<span ng-if=\"node.nodeData('status') === 'Approved' || node.nodeData('status') === 'Denied'\">\n" +
+    "<span ng-if=\"node.nodeData('type') === 'Approved' || node.nodeData('type') === 'Denied'\">\n" +
     "{{node.nodeData('approvalTimestamp') | date : 'medium'}}\n" +
     "</span>\n" +
-    "<span ng-if=\"node.nodeData('status') === 'Notified'\">\n" +
+    "<span ng-if=\"node.nodeData('type') === 'In Progress'\">\n" +
     "--\n" +
     "</span>\n" +
+    "</div>\n" +
+    "</div>\n" +
     "</div>\n" +
     "</div>\n" +
     "</div>\n" +
@@ -14157,20 +14172,17 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "\n" +
     "<g ng-repeat=\"connection in chart.connections\" class=\"connection\">\n" +
     "<g>\n" +
-    "<path class=\"connection-line\" ng-attr-d=\"M {{connection.sourceCoordX()}}, {{connection.sourceCoordY()}}\n" +
-    "                                   L {{connection.middleCoordX()}}, {{connection.sourceCoordY()}}\n" +
-    "                                   L {{connection.middleCoordX()}}, {{connection.destCoordY()}}\n" +
-    "                                   L {{connection.destCoordX()}}, {{connection.destCoordY()}}\">\n" +
+    "<path class=\"connection-line {{connection.classes()}}\" ng-attr-d=\"M {{connection.sourceCoordX()}}, {{connection.sourceCoordY()}}\n" +
+    "                               L {{connection.middleCoordX()}}, {{connection.sourceCoordY()}}\n" +
+    "                               L {{connection.middleCoordX()}}, {{connection.destCoordY()}}\n" +
+    "                               L {{connection.destCoordX()}}, {{connection.destCoordY()}}\">\n" +
     "</path>\n" +
-    "<polygon class=\"connection-endpoint\" ng-attr-points=\"{{connection.destEndPoints(connectorSize)}}\">\n" +
+    "<polygon class=\"connection-endpoint {{connection.classes()}}\" ng-attr-points=\"{{connection.destEndPoints(connectorSize)}}\">\n" +
     "</polygon>\n" +
     "</g>\n" +
     "</g>\n" +
     "</g>\n" +
     "</svg>\n" +
-    "</div>\n" +
-    "</div>\n" +
-    "</div>\n" +
     "</div>\n" +
     "</div>"
   );

@@ -16,6 +16,8 @@ angular.module('openshiftConsole')
                                                      DataService,
                                                      KeywordService,
                                                      ProjectsService) {
+    var debug = false;
+
     var configMapsVersion = APIService.getPreferredVersion('configmaps');
     var serviceInstancesVersion = APIService.getPreferredVersion('serviceinstances');
 
@@ -83,6 +85,29 @@ angular.module('openshiftConsole')
       });
     };
 
+    var hasPendingConfigMap = function(project, serviceInstance) {
+      if (!debug) {
+        return false;
+      }
+
+      console.log("service instance: " + serviceInstance.metadata.name);
+      console.log(serviceInstance.metadata.uid);
+      var hasPendingApprover = function(approvalStatus) {
+        for (var i = 1; i <= approvalStatus.num_approvers; i++) {
+          var status = approvalStatus['approver_' + i + '_status'];
+          if (status === 'Notified' ||status === 'Pending') {
+            return true;
+          }
+        }
+        return false;
+      };
+
+      var approvalMapName = serviceInstance.metadata.uid + '-status';
+      var approvalStatusYAML = _.get(_.get(project.configMaps, approvalMapName), 'data.status');
+
+      return approvalStatusYAML && hasPendingApprover(parseYAML(approvalStatusYAML));
+    };
+
     var updatePendingRequests = function(project) {
       if (!project.configMaps || !project.serviceInstances) {
         return;
@@ -91,7 +116,7 @@ angular.module('openshiftConsole')
       project.pendingRequestsCount = 0;
       project.pendingRequests = [];
       _.each(project.serviceInstances, function(serivceInstance) {
-        if (_.get(serivceInstance, 'status.asyncOpInProgress')) {
+        if (_.get(serivceInstance, 'status.asyncOpInProgress') || hasPendingConfigMap(project, serivceInstance)) {
           project.pendingRequestsCount++;
         }
       });
@@ -113,7 +138,7 @@ angular.module('openshiftConsole')
           };
 
           // Get the quota config map
-          watches.push(DataService.watch(configMapsVersion, context, function(configMapData) {
+          watches.push(DataService.watch(configMapsVersion, context, function (configMapData) {
             project.configMaps = configMapData.by("metadata.name");
             project.quotaData = parseYAML(_.get(project.configMaps, 'redhat-quota.data.quota'));
             updatePendingRequests(project);

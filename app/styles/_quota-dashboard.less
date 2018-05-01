@@ -1,7 +1,7 @@
 .project-quota-card {
-  .project-actions {
-    float: right;
-    margin-top: -5px;
+  .badge {
+    margin: -1px 3px 0 0;
+
   }
   .progress-description {
     .fa, .pficon {
@@ -10,6 +10,10 @@
   }
   .progress-unavailable {
     text-align: center;
+  }
+  .project-actions {
+    float: right;
+    margin-top: -5px;
   }
   .quota-dashboard-chart {
     display: inline-block;
@@ -38,22 +42,40 @@
   width: 100%;
 }
 
-.order-workflow-canvas {
-  height: 100%;
+.quota-dashboard-container {
+  border-top: 1px solid @color-pf-black-400;
+  bottom: 0;
+  left: 0;
+  padding: 35px 25px;
+  position: fixed;
+  right: 0;
+  top: 130px;
+}
+
+.order-workflow-container {
+  border-top: 1px solid @color-pf-black-400;
+  bottom: 0;
+  left: 0;
   overflow: auto;
-  padding-left: 25px;
-  width: 100%;
-
-  .canvas-in-connection-mode {
-    background-color: @color-pf-black-400;
-    background-image: none !important;
-    background-repeat: unset !important;
+  padding: 35px;
+  position: fixed;
+  right: 0;
+  top: 76px;
+  &.shaded {
+    background-color: @panel-shaded;
   }
-
+  @media(min-width: @screen-sm-min) {
+    top: 96px;
+  }
+  .node-card {
+    height: 100%;
+    margin: 0;
+    width: 100%;
+  }
   .node-header {
     display: table;
     font-size: 24px;
-    margin-bottom: -10px;
+    font-weight: 200;
     text-align: center;
     width: 100%;
   }
@@ -61,20 +83,25 @@
   .node-header-detail {
     display: table;
     font-size: 12px;
-    height: 20px;
+    height: 17px;
     margin-bottom: 10px;
     text-align: center;
     width: 100%;
   }
 
   .node-status-icon {
-    color: @color-pf-black-700;
-    font-size: 60px;
+    color: @color-pf-black-400;
+    font-size: 42px;
     text-align: center;
     width: 100%;
+
+    &.pficon-orders {
+      color: @color-pf-green-400;
+    }
   }
 
   .node-info-title {
+    font-weight: 700;
     margin-left: 20px;
     margin-top: 10px;
   }
@@ -89,67 +116,37 @@
   .node-rect {
     fill: @color-pf-white;
     fill-opacity: 1.0;
-    stroke: @color-pf-black-400;
-    stroke-width: 2;
+    stroke-width: 0;
   }
   .node-icon {
     font-size: 76px;
-  }
-  .svg-triangle {
-    polyline {
-      fill: @color-pf-black-150;
-      stroke: @color-pf-black-400;
-      stroke-width: 2;
-    }
-  }
-  .connector-icons {
-    cursor: pointer;
-    fill: @color-pf-blue-400;
-    font-size: 16px;
-    &:hover {
-      fill: #063451;
-    }
-  }
-  .connector-tooltip {
-    fill: @color-pf-black-150;
-    stroke-width: 1;
-    stroke: @color-pf-black;
-  }
-  .connector-tooltip-text {
-    font-size: 10px;
-  }
-  .connector-circle {
-    fill: @color-pf-white;
-    stroke-width: 2;
-    stroke: @color-pf-black;
-  }
-  .unconnected-circle {
-    fill: @color-pf-green-500;
-    stroke: @color-pf-black;
-    stroke-opacity: "0.8";
-    stroke-width: 2;
   }
   .connection-line {
     fill: transparent;
     stroke-width: 4;
     stroke: @color-pf-black-500;
+    &.pending {
+      stroke-dasharray: 4 1;
+    }
+    &.approved, &.in-progress {
+      stroke: @color-pf-green-400;
+    }
+    &.skipped {
+      stroke-dasharray: 4 1;
+      stroke: @color-pf-red-100;
+    }
   }
   .connection-endpoint {
     fill: @color-pf-black-500;
-    stroke: @color-pf-black;
+    stroke: @color-pf-black-500;
     stroke-width: 1;
-  }
-  .node-chart-title, .node-chart-units {
-    padding: 0 10px;
-    float: left;
-    width: 60px;
-  }
-  .node-chart-progress {
-    display: inline-block;
-    float: left;
-    width: 180px;
-  }
-  .connection-name {
-    fill: @color-pf-black;
+    &.approved, &.in-progress {
+      fill: @color-pf-green-400;
+      stroke: @color-pf-green-400;
+    }
+    &.skipped {
+      fill: @color-pf-red-100;
+      stroke: @color-pf-red-100;
+    }
   }
 }

@@ -6,6 +6,7 @@ angular.module("openshiftConsole")
     var parentGap = 50;
     var nodeHeight = 300;
     var siblingGap = 100;
+    var canvasPadding = 5;
     var connectorSize = 6;
 
     var createConnectorViewModel = function(_x, _y, _parentNode) {
@@ -149,6 +150,10 @@ angular.module("openshiftConsole")
         return data[attr] || "";
       };
 
+      var classes = function() {
+        return (data.source.connectorClass || '') + ' ' + (data.dest.connectorClass || '');
+      };
+
       var sourceCoordX = function() {
         return source.parentNode().x() + source.x();
       };
@@ -165,11 +170,12 @@ angular.module("openshiftConsole")
       };
 
       var destCoordX = function() {
-        return dest.parentNode().x() + dest.x();
+
+        return dest.parentNode().x() + dest.x() - (destIndex === 1 ? 0 : 2);
       };
 
       var destCoordY = function() {
-        return dest.parentNode().y() + dest.y();
+        return dest.parentNode().y() + dest.y() - (destIndex === 1 ? 2 : 0);
       };
 
       var destCoord = function() {
@@ -197,8 +203,8 @@ angular.module("openshiftConsole")
       var destEndPoints = function(size) {
         var p1X, p1Y, p2X, p2Y, p3X, p3Y;
 
-        p1X = destCoordX();
-        p1Y = destCoordY();
+        p1X = destCoordX() + (destIndex === 1 ? 0 : 2);
+        p1Y = destCoordY() + (destIndex === 1 ? 2 : 0);
 
         if (destIndex === 1) {
           p2X = p1X - size;
@@ -222,6 +228,7 @@ angular.module("openshiftConsole")
         data: data,
         source: source,
         dest: dest,
+        classes: classes,
         connectionData: connectionData,
         sourceCoordX: sourceCoordX,
         sourceCoordY: sourceCoordY,
@@ -327,8 +334,8 @@ angular.module("openshiftConsole")
         maxY = Math.max(maxY, node.y() + node.yOffset() + node.height());
       });
 
-      width = parentGap + maxX;
-      height = siblingGap + maxY;
+      width = maxX + canvasPadding;
+      height = maxY + canvasPadding;
 
       //
       // Wrap the connections data-model in a view-model.

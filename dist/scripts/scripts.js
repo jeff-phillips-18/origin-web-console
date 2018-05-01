@@ -3711,9 +3711,9 @@ return t.parentNode().x() + t.x();
 }, o = function() {
 return t.parentNode().y() + t.y();
 }, i = function() {
-return n.parentNode().x() + n.x();
+return n.parentNode().x() + n.x() - (1 === r ? 0 : 2);
 }, s = function() {
-return n.parentNode().y() + n.y();
+return n.parentNode().y() + n.y() - (1 === r ? 2 : 0);
 }, c = function() {
 return Math.abs(a() + (i() - a()) / 2);
 }, l = function() {
@@ -3723,6 +3723,9 @@ return {
 data: e,
 source: t,
 dest: n,
+classes: function() {
+return (e.source.connectorClass || "") + " " + (e.dest.connectorClass || "");
+},
 connectionData: function(t) {
 return e[t] || "";
 },
@@ -3752,7 +3755,7 @@ y: l()
 },
 destEndPoints: function(e) {
 var t, n, a, o, c, l;
-return t = i(), n = s(), 1 === r ? (a = t - e, o = n - 2 * e, c = t + e, l = n - 2 * e) : (a = t - 2 * e, o = n - e, c = t - 2 * e, l = n + e), t + "," + n + " " + a + "," + o + " " + c + "," + l;
+return t = i() + (1 === r ? 0 : 2), n = s() + (1 === r ? 2 : 0), 1 === r ? (a = t - e, o = n - 2 * e, c = t + e, l = n - 2 * e) : (a = t - 2 * e, o = n - e, c = t - 2 * e, l = n + e), t + "," + n + " " + a + "," + o + " " + c + "," + l;
 }
 };
 }, o = function(e) {
@@ -3785,7 +3788,7 @@ return n.outputConnectors[t];
 }, l = 0, u = 0;
 _.each(r, function(e) {
 l = Math.max(l, e.x() + e.xOffset() + e.width()), u = Math.max(u, e.y() + e.yOffset() + e.height());
-}), t = 50 + l, n = 100 + u;
+}), t = l + 5, n = u + 5;
 var d = [];
 if (e.connections) for (var m = 0; m < e.connections.length; ++m) d.push(function(e) {
 var t = c(e.source.nodeID, e.source.connectorIndex), n = s(e.dest.nodeID, e.dest.connectorIndex);
@@ -5295,27 +5298,30 @@ connections: []
 }, r.data.nodes.push({
 id: 1,
 type: "initial",
-status: "Initiated",
+title: "Request Initiated",
+statusIconClass: "pficon pficon-add-circle-o",
 requester: _.get(n, "requester"),
 initiatedTimestamp: _.get(r.service, "metadata.creationTimestamp"),
 width: 230,
-height: 150,
-yOffset: r.isMobile ? 0 : 75
+height: 250,
+yOffset: r.isMobile ? 0 : 25
 });
 for (var a = 1; a <= n.num_approvers; a++) {
-var o, i = _.get(n, "approver_" + a + "_status");
-"Approved" === i ? o = "pficon pficon-ok" : "Notified" === i ? o = "fa fa-spinner" : "Pending" === i ? o = "pficon pficon-pending" : "Denied" === i ? o = "pficon pficon-error-circle-o" : "Skipped" === i && (o = "pficon pficon-info"), r.data.nodes.push({
+var o, i, c = _.get(n, "approver_" + a + "_status"), l = c;
+"Approved" === c ? (o = "pficon pficon-orders", "approved", i = "approved") : "Notified" === c ? (l = "In Progress", o = "fa fa-spinner", i = "in-progress") : "Pending" === c ? (o = "pficon pficon-pending", i = "pending") : "Denied" === c ? (o = "pficon pficon-error-circle-o", i = "denied") : "Skipped" === c && (o = "fa fa-step-forward", i = "skipped"), r.data.nodes.push({
 id: a + 1,
+type: c,
+title: l,
 parentId: r.isMobile ? void 0 : a,
 prevSiblingId: r.isMobile ? a : void 0,
-type: "approval",
-status: i,
+status: c,
 statusIconClass: o,
 approverName: _.get(n, "approver_" + a + "_name"),
 approverUrl: _.get(n, "approver_" + a + "_url"),
 initiatedTimestamp: parseInt(_.get(n, "approver_" + a + "_initiated_at")),
 approvalTimestamp: parseInt(_.get(n, "approver_" + a + "_approved_at")),
-xOffset: r.isMobile ? 25 : 0
+width: 230,
+height: 300
 }), r.data.connections.push({
 source: {
 nodeID: a,
@@ -5323,7 +5329,8 @@ connectorIndex: r.isMobile ? 1 : 0
 },
 dest: {
 nodeID: a + 1,
-connectorIndex: r.isMobile ? 1 : 0
+connectorIndex: r.isMobile ? 1 : 0,
+connectorClass: i
 }
 });
 }
@@ -5384,7 +5391,7 @@ var e = !0, t = !0;
 v.push(i.watch(p, n.context, function(r) {
 d = r.by("metadata.name"), b(), e = !1, n.loading = n.loading && (t || e);
 }, function(e) {})), v.push(i.watch(f, n.context, function(r) {
-m = r.by("metadata.name"), b(), t = !1, n.loading = n.loading && (t || e);
+m = _.sortBy(r.by("metadata.name"), "metadata.creationTimestamp"), b(), t = !1, n.loading = n.loading && (t || e);
 }, {
 poll: g,
 pollInterval: 6e4
