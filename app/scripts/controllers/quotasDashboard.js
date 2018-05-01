@@ -15,6 +15,7 @@ angular.module('openshiftConsole')
                                                      AuthService,
                                                      DataService,
                                                      KeywordService,
+                                                     Navigate,
                                                      ProjectsService) {
     var debug = false;
 
@@ -140,8 +141,15 @@ angular.module('openshiftConsole')
           // Get the quota config map
           watches.push(DataService.watch(configMapsVersion, context, function (configMapData) {
             project.configMaps = configMapData.by("metadata.name");
-            project.quotaData = parseYAML(_.get(project.configMaps, 'redhat-quota.data.quota'));
-            updatePendingRequests(project);
+            var quotaMap = _.get(project.configMaps, 'redhat-quota.data.quota');
+            if (quotaMap) {
+              project.quotaData = parseYAML(quotaMap);
+              updatePendingRequests(project);
+            } else {
+              _.remove($scope.projects, function(nextProject) {
+                return nextProject === project;
+              });
+            }
 
             if (++quotasLoaded >= _.size($scope.projects)) {
               quotasLoading = false;
@@ -160,6 +168,26 @@ angular.module('openshiftConsole')
           }, {poll: limitWatches, pollInterval: DEFAULT_POLL_INTERVAL}));
         });
       }
+    };
+
+    $scope.newProjectPanelShown = false;
+
+    $scope.createProject = function(event) {
+      var button =_.get(event, 'target');
+      while (button && !angular.element(button).hasClass('btn')) {
+        button = button.parentElement;
+      }
+      $scope.popupElement = button;
+      $scope.newProjectPanelShown = true;
+    };
+
+    $scope.closeNewProjectPanel = function() {
+      $scope.newProjectPanelShown = false;
+    };
+
+    $scope.onNewProject = function(projectName) {
+      $scope.newProjectPanelShown = false;
+      Navigate.toProjectOverview(projectName);
     };
 
     // Set up the sort configuration for `pf-sort`.

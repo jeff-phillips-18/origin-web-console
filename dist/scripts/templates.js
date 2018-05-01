@@ -13829,6 +13829,9 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
 
   $templateCache.put('views/quotas-dashboard.html',
     "<div class=\"middle\">\n" +
+    "<origin-modal-popup class=\"projects-list-create-popup\" shown=\"newProjectPanelShown\" modal-title=\"Create Project\" on-close=\"closeNewProjectPanel\" reference-element=\"popupElement\">\n" +
+    "<create-project is-dialog=\"true\" redirect-action=\"onNewProject\" on-cancel=\"closeNewProjectPanel\"></create-project>\n" +
+    "</origin-modal-popup>\n" +
     "<div class=\"container-fluid\">\n" +
     "<div class=\"projects-header\">\n" +
     "<div class=\"projects-bar\">\n" +
@@ -13863,7 +13866,24 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "<div ng-if=\"loading\" class=\"empty-state-message\">\n" +
     "<h2 class=\"text-center\">Loading...</h2>\n" +
     "</div>\n" +
-    "<div ng-if=\"!loading\" class=\"row row-cards-pf\">\n" +
+    "<div ng-if=\"!loading && !projects.length\">\n" +
+    "<div class=\"empty-state-message empty-state-full-page text-center\">\n" +
+    "<h1>Welcome to OpenShift.</h1>\n" +
+    "<p>\n" +
+    "OpenShift helps you quickly develop, host, and scale applications.<br>\n" +
+    "<span ng-if=\"canCreate\">Create a project for your application.</span>\n" +
+    "</p>\n" +
+    "<div>\n" +
+    "<button ng-click=\"createProject($event)\" class=\"btn btn-lg btn-primary\">\n" +
+    "<span class=\"fa fa-plus\" aria-hidden=\"true\"></span>\n" +
+    "<span class=\"icon-button-text\">Create Project</span>\n" +
+    "</button>\n" +
+    "</div>\n" +
+    "<p>To learn more, visit the OpenShift <a target=\"_blank\" ng-href=\"{{'' | helpLink}}\">documentation</a>.</p>\n" +
+    "<p class=\"projects-instructions\" ng-if=\"canCreate === false\" ng-include=\"'views/_cannot-create-project.html'\"></p>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "<div ng-if=\"!loading && projects.length\" class=\"row row-cards-pf\">\n" +
     "<div ng-repeat=\"project in projects | limitTo: limitListTo track by (project | uid)\" class=\"col-xs-12 col-sm-6 col-lg-4\">\n" +
     "<div class=\"project-quota-card card-pf\">\n" +
     "<div class=\"card-pf-heading\">\n" +

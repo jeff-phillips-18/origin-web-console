@@ -5404,56 +5404,67 @@ l.toProjectList();
 })), n.$on("$destroy", function() {
 i.unwatchAll(v);
 });
-} ]), angular.module("openshiftConsole").controller("QuotasDashboardController", [ "$filter", "$scope", "APIService", "AuthService", "DataService", "KeywordService", "ProjectsService", function(e, t, n, r, a, o, i) {
-var s, c, l, u = n.getPreferredVersion("configmaps"), d = n.getPreferredVersion("serviceinstances"), m = e("isIE")(), p = [], f = [], g = [ "metadata.name", 'metadata.annotations["openshift.io/display-name"]', 'metadata.annotations["openshift.io/description"]', 'metadata.annotations["openshift.io/requester"]' ], v = function() {
-t.projects = o.filterForKeywords(c, g, f);
-}, h = e("displayName"), y = function() {
+} ]), angular.module("openshiftConsole").controller("QuotasDashboardController", [ "$filter", "$scope", "APIService", "AuthService", "DataService", "KeywordService", "Navigate", "ProjectsService", function(e, t, n, r, a, o, i, s) {
+var c, l, u, d = n.getPreferredVersion("configmaps"), m = n.getPreferredVersion("serviceinstances"), p = e("isIE")(), f = [], g = [], v = [ "metadata.name", 'metadata.annotations["openshift.io/display-name"]', 'metadata.annotations["openshift.io/description"]', 'metadata.annotations["openshift.io/requester"]' ], h = function() {
+t.projects = o.filterForKeywords(l, v, g);
+}, y = e("displayName"), b = function() {
 var e = _.get(t, "sortConfig.currentField.id");
-l !== e && (t.sortConfig.isAscending = "metadata.creationTimestamp" !== e);
+u !== e && (t.sortConfig.isAscending = "metadata.creationTimestamp" !== e);
 var n = function(e) {
-return h(e).toLowerCase();
+return y(e).toLowerCase();
 }, r = t.sortConfig.isAscending ? "asc" : "desc";
 switch (e) {
 case 'metadata.annotations["openshift.io/display-name"]':
-c = _.orderBy(s, [ n, "metadata.name" ], [ r ]);
+l = _.orderBy(c, [ n, "metadata.name" ], [ r ]);
 break;
 
 case 'metadata.annotations["openshift.io/requester"]':
-c = _.orderBy(s, [ e, n ], [ r, "asc" ]);
+l = _.orderBy(c, [ e, n ], [ r, "asc" ]);
 break;
 
 default:
-c = _.orderBy(s, [ e ], [ r ]);
+l = _.orderBy(c, [ e ], [ r ]);
 }
-l = e;
-}, b = function(e) {
+u = e;
+}, S = function(e) {
 return jsyaml.safeLoad(e, {
 json: !0
 });
-}, S = function(e) {
+}, C = function(e) {
 e.configMaps && e.serviceInstances && (e.pendingRequestsCount = 0, e.pendingRequests = [], _.each(e.serviceInstances, function(t) {
 _.get(t, "status.asyncOpInProgress") && e.pendingRequestsCount++;
 }));
-}, C = function() {
-if (s) {
-y(), v();
+}, w = function() {
+if (c) {
+b(), h();
 var e = !0, n = !0, r = 0, o = 0;
 _.each(t.projects, function(i) {
 var s = {
 namespace: i.metadata.name
 };
-p.push(a.watch(u, s, function(a) {
-i.configMaps = a.by("metadata.name"), i.quotaData = b(_.get(i.configMaps, "redhat-quota.data.quota")), S(i), ++r >= _.size(t.projects) && (e = !1, t.loading = t.loading && (n || e));
-})), p.push(a.watch(d, s, function(r) {
-i.serviceInstances = r.by("metadata.name"), S(i), ++o >= _.size(t.projects) && (n = !1, t.loading = t.loading && (n || e));
+f.push(a.watch(d, s, function(a) {
+i.configMaps = a.by("metadata.name");
+var o = _.get(i.configMaps, "redhat-quota.data.quota");
+o ? (i.quotaData = S(o), C(i)) : _.remove(t.projects, function(e) {
+return e === i;
+}), ++r >= _.size(t.projects) && (e = !1, t.loading = t.loading && (n || e));
+})), f.push(a.watch(m, s, function(r) {
+i.serviceInstances = r.by("metadata.name"), C(i), ++o >= _.size(t.projects) && (n = !1, t.loading = t.loading && (n || e));
 }, {
-poll: m,
+poll: p,
 pollInterval: 6e4
 }));
 });
 }
 };
-t.sortConfig = {
+t.newProjectPanelShown = !1, t.createProject = function(e) {
+for (var n = _.get(e, "target"); n && !angular.element(n).hasClass("btn"); ) n = n.parentElement;
+t.popupElement = n, t.newProjectPanelShown = !0;
+}, t.closeNewProjectPanel = function() {
+t.newProjectPanelShown = !1;
+}, t.onNewProject = function(e) {
+t.newProjectPanelShown = !1, i.toProjectOverview(e);
+}, t.sortConfig = {
 fields: [ {
 id: 'metadata.annotations["openshift.io/display-name"]',
 title: "Display Name",
@@ -5472,17 +5483,17 @@ title: "Creation Date",
 sortType: "alpha"
 } ],
 isAscending: !0,
-onSortChange: C
+onSortChange: w
 };
-var w = function(e) {
-s = _.toArray(e.by("metadata.name")), C();
+var P = function(e) {
+c = _.toArray(e.by("metadata.name")), w();
 };
 t.$watch("search.text", _.debounce(function(e) {
-t.keywords = f = o.generateKeywords(e), t.$applyAsync(v);
-}, 350)), t.loading = !0, p.push(i.watch(t, function(e) {
-w(e);
+t.keywords = g = o.generateKeywords(e), t.$applyAsync(h);
+}, 350)), t.loading = !0, f.push(s.watch(t, function(e) {
+P(e);
 })), t.$on("$destroy", function() {
-a.unwatchAll(p);
+a.unwatchAll(f);
 });
 } ]), angular.module("openshiftConsole").controller("MonitoringController", [ "$routeParams", "$location", "$scope", "$filter", "APIService", "BuildsService", "DataService", "ImageStreamResolver", "KeywordService", "Logger", "MetricsService", "Navigate", "PodsService", "ProjectsService", "$rootScope", function(e, t, n, r, a, o, i, s, c, l, u, d, m, p, f) {
 n.projectName = e.project, n.alerts = n.alerts || {}, n.renderOptions = n.renderOptions || {}, n.renderOptions.showEventsSidebar = !0, n.renderOptions.collapseEventsSidebar = "true" === localStorage.getItem("monitoring.eventsidebar.collapsed"), n.buildsLogVersion = a.getPreferredVersion("builds/log"), n.podsLogVersion = a.getPreferredVersion("pods/log"), n.deploymentConfigsLogVersion = a.getPreferredVersion("deploymentconfigs/log");
