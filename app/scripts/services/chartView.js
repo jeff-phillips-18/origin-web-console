@@ -155,11 +155,11 @@ angular.module("openshiftConsole")
       };
 
       var sourceCoordX = function() {
-        return source.parentNode().x() + source.x();
+        return source.parentNode().xOffset() + source.parentNode().x() + data.source.xOffset;
       };
 
       var sourceCoordY = function() {
-        return source.parentNode().y() + source.y();
+        return source.parentNode().yOffset() + source.parentNode().y() + data.source.yOffset;
       };
 
       var sourceCoord = function() {
@@ -170,12 +170,11 @@ angular.module("openshiftConsole")
       };
 
       var destCoordX = function() {
-
-        return dest.parentNode().x() + dest.x() - (destIndex === 1 ? 0 : 2);
+        return dest.parentNode().xOffset() + dest.parentNode().x() + data.dest.xOffset - (destIndex === 1 ? 0 : 2);
       };
 
       var destCoordY = function() {
-        return dest.parentNode().y() + dest.y() - (destIndex === 1 ? 2 : 0);
+        return dest.parentNode().yOffset() + dest.parentNode().y() + data.dest.yOffset - (destIndex === 1 ? 2 : 0);
       };
 
       var destCoord = function() {

@@ -16,15 +16,51 @@
   </div>
   <div class="middle-content order-workflow-container">
     <div>
-      <table class="table dataTable table-striped table-bordered table-mobile table-layout-fixed">
+      <table class="table table-striped table-bordered table-hover dataTable table-mobile table-layout-fixed">
         <thead>
           <tr>
-            <th>Request</th>
-            <th>Requester</th>
-            <th class="sorting_asc">Request Date</th>
-            <th>Approval Status</th>
-            <th>Pending Approver</th>
-            <th>Approval Request</th>
+            <th
+              ng-class="{sorting_asc: sortId === 'request' && sortAsc,
+                         sorting_desc: sortId === 'request' && !sortAsc,
+                         sorting: sortId !== 'request'}"
+              ng-click="updateSort('request')">
+              Request
+            </th>
+            <th
+              ng-class="{sorting_asc: sortId === 'requester' && sortAsc,
+                         sorting_desc: sortId === 'requester' && !sortAsc,
+                         sorting: sortId !== 'requester'}"
+              ng-click="updateSort('requester')">
+              Requester
+            </th>
+            <th
+              ng-class="{sorting_asc: sortId === 'requestDate' && sortAsc,
+                         sorting_desc: sortId === 'requestDate' && !sortAsc,
+                         sorting: sortId !== 'requestDate'}"
+              ng-click="updateSort('requestDate')">
+              Request Date
+            </th>
+            <th
+              ng-class="{sorting_asc: sortId === 'status' && sortAsc,
+                         sorting_desc: sortId === 'status' && !sortAsc,
+                         sorting: sortId !== 'status'}"
+              ng-click="updateSort('status')">
+              Approval Status
+            </th>
+            <th
+              ng-class="{sorting_asc: sortId === 'approverName' && sortAsc,
+                         sorting_desc: sortId === 'approverName' && !sortAsc,
+                         sorting: sortId !== 'approverName'}"
+              ng-click="updateSort('approverName')">
+              Pending Approver
+            </th>
+            <th
+              ng-class="{sorting_asc: sortId === 'approverRequest' && sortAsc,
+                         sorting_desc: sortId === 'approverRequest' && !sortAsc,
+                         sorting: sortId !== 'approverRequest'}"
+              ng-click="updateSort('approverRequest')">
+              Approval Request
+            </th>
           </tr>
         </thead>
         <tbody ng-if="(pendingRequests | hashSize) == 0">
@@ -33,7 +69,7 @@
         <tbody ng-if="(pendingRequests | hashSize) > 0">
           <tr ng-repeat="pendingRequest in pendingRequests track by $index" ng-click="navigateTo(pendingRequest)" class="clickable-row">
             <td data-title="Request">
-              <span>{{pendingRequest.serviceInstance | displayName}}</span>
+              <span>{{pendingRequest.serviceInstanceName}}</span>
             </td>
             <td data-title="Requester">
               <span>{{pendingRequest.requester}}</span>

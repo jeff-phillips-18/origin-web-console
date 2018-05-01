@@ -31,12 +31,56 @@ angular.module('openshiftConsole')
     var watches = [];
     var configMaps;
     var serviceInstances;
+    var displayFilter = $filter('displayName');
 
     $scope.projectName = $routeParams.requestproject;
     $scope.pendingRequests = [];
+    $scope.sortId = 'requestDate';
+    $scope.sortAsc = true;
+
+    var sortRequests = function() {
+      var sortField;
+      switch ($scope.sortId) {
+        case ('request'):
+          sortField = 'serviceInstanceName';
+          break;
+        case ('requester'):
+          sortField = 'requester';
+          break;
+        case ('requestDate'):
+          sortField = 'requestTimestamp';
+          break;
+        case ('status'):
+          sortField = 'approvalStatus';
+          break;
+        case ('approverName'):
+          sortField = 'approver';
+          break;
+        case('approverRequest'):
+          sortField = 'approvalRequestTimestamp';
+          break;
+        default:
+          sortField = 'serviceInstanceName';
+      }
+      $scope.pendingRequests = _.sortBy($scope.pendingRequests, sortField);
+      if (!$scope.sortAsc) {
+        _.reverse($scope.pendingRequests);
+      }
+    };
 
     $scope.navigateTo = function(request) {
       $location.url('quotas/requests/' + $scope.projectName + '/' + request.serviceInstance.metadata.name);
+    };
+
+    $scope.updateSort = function(sortId) {
+      if (sortId === $scope.sortId) {
+        $scope.sortAsc = !$scope.sortAsc;
+      } else {
+        $scope.sortId = sortId;
+        $scope.sortAsc = true;
+      }
+
+      sortRequests();
     };
 
     var parseYAML = function(yamlData) {
@@ -89,6 +133,7 @@ angular.module('openshiftConsole')
           if (approvalStatusYAML) {
             approvalStatus = parseYAML(approvalStatusYAML);
             approvalStatus.serviceInstance = serviceInstance;
+            approvalStatus.serviceInstanceName = displayFilter(serviceInstance);
 
             var nextApprover = nextApproverCount(approvalStatus);
             if (approvalStatus && nextApprover) {
@@ -104,6 +149,7 @@ angular.module('openshiftConsole')
           $scope.pendingRequests.push(approvalStatus);
         }
       });
+      sortRequests();
     };
 
     var update = function() {
@@ -112,15 +158,14 @@ angular.module('openshiftConsole')
 
       // Get the config maps
       watches.push(DataService.watch(configMapsVersion, $scope.context, function(configMapData) {
-          configMaps = configMapData.by("metadata.name");
-          updatePendingRequests();
+        configMaps = configMapData.by("metadata.name");
+        updatePendingRequests();
 
-          requestsLoading = false;
-          $scope.loading = $scope.loading && (servicesLoading || requestsLoading);
-        },
-        function(e) {
-        }
-      ));
+        requestsLoading = false;
+        $scope.loading = $scope.loading && (servicesLoading || requestsLoading);
+      },
+      function(e) {
+      }));
 
       // Get the services to find any that are pending approvals
       watches.push(DataService.watch(serviceInstancesVersion, $scope.context, function (serviceInstancesData) {

@@ -13324,15 +13324,39 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "</div>\n" +
     "<div class=\"middle-content order-workflow-container\">\n" +
     "<div>\n" +
-    "<table class=\"table dataTable table-striped table-bordered table-mobile table-layout-fixed\">\n" +
+    "<table class=\"table table-striped table-bordered table-hover dataTable table-mobile table-layout-fixed\">\n" +
     "<thead>\n" +
     "<tr>\n" +
-    "<th>Request</th>\n" +
-    "<th>Requester</th>\n" +
-    "<th class=\"sorting_asc\">Request Date</th>\n" +
-    "<th>Approval Status</th>\n" +
-    "<th>Pending Approver</th>\n" +
-    "<th>Approval Request</th>\n" +
+    "<th ng-class=\"{sorting_asc: sortId === 'request' && sortAsc,\n" +
+    "                         sorting_desc: sortId === 'request' && !sortAsc,\n" +
+    "                         sorting: sortId !== 'request'}\" ng-click=\"updateSort('request')\">\n" +
+    "Request\n" +
+    "</th>\n" +
+    "<th ng-class=\"{sorting_asc: sortId === 'requester' && sortAsc,\n" +
+    "                         sorting_desc: sortId === 'requester' && !sortAsc,\n" +
+    "                         sorting: sortId !== 'requester'}\" ng-click=\"updateSort('requester')\">\n" +
+    "Requester\n" +
+    "</th>\n" +
+    "<th ng-class=\"{sorting_asc: sortId === 'requestDate' && sortAsc,\n" +
+    "                         sorting_desc: sortId === 'requestDate' && !sortAsc,\n" +
+    "                         sorting: sortId !== 'requestDate'}\" ng-click=\"updateSort('requestDate')\">\n" +
+    "Request Date\n" +
+    "</th>\n" +
+    "<th ng-class=\"{sorting_asc: sortId === 'status' && sortAsc,\n" +
+    "                         sorting_desc: sortId === 'status' && !sortAsc,\n" +
+    "                         sorting: sortId !== 'status'}\" ng-click=\"updateSort('status')\">\n" +
+    "Approval Status\n" +
+    "</th>\n" +
+    "<th ng-class=\"{sorting_asc: sortId === 'approverName' && sortAsc,\n" +
+    "                         sorting_desc: sortId === 'approverName' && !sortAsc,\n" +
+    "                         sorting: sortId !== 'approverName'}\" ng-click=\"updateSort('approverName')\">\n" +
+    "Pending Approver\n" +
+    "</th>\n" +
+    "<th ng-class=\"{sorting_asc: sortId === 'approverRequest' && sortAsc,\n" +
+    "                         sorting_desc: sortId === 'approverRequest' && !sortAsc,\n" +
+    "                         sorting: sortId !== 'approverRequest'}\" ng-click=\"updateSort('approverRequest')\">\n" +
+    "Approval Request\n" +
+    "</th>\n" +
     "</tr>\n" +
     "</thead>\n" +
     "<tbody ng-if=\"(pendingRequests | hashSize) == 0\">\n" +
@@ -13341,7 +13365,7 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "<tbody ng-if=\"(pendingRequests | hashSize) > 0\">\n" +
     "<tr ng-repeat=\"pendingRequest in pendingRequests track by $index\" ng-click=\"navigateTo(pendingRequest)\" class=\"clickable-row\">\n" +
     "<td data-title=\"Request\">\n" +
-    "<span>{{pendingRequest.serviceInstance | displayName}}</span>\n" +
+    "<span>{{pendingRequest.serviceInstanceName}}</span>\n" +
     "</td>\n" +
     "<td data-title=\"Requester\">\n" +
     "<span>{{pendingRequest.requester}}</span>\n" +
@@ -14133,13 +14157,18 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "<div class=\"node-card card-pf\" ng-class=\"{'card-pf-accented': node.nodeData('type') === 'Notified'}\">\n" +
     "<div class=\"card-pf-body\">\n" +
     "<div class=\"node-status-icon {{node.nodeData('statusIconClass')}}\"></div>\n" +
-    "<span class=\"node-header\">\n" +
+    "<div class=\"node-header\">\n" +
     "{{node.nodeData('title')}}\n" +
-    "</span>\n" +
-    "<div ng-if=\"node.nodeData('type') === 'initial'\">\n" +
-    "<div class=\"node-header-detail\">\n" +
-    "{{service | displayName}}\n" +
     "</div>\n" +
+    "<div class=\"node-header-detail\">\n" +
+    "<span ng-if=\"node.nodeData('type') === 'initial'\">\n" +
+    "{{service | displayName}}\n" +
+    "</span>\n" +
+    "<span ng-if=\"node.nodeData('type') === 'Notified'\">\n" +
+    "{{node.nodeData('initiatedTimestamp') | momentAgo }}\n" +
+    "</span>\n" +
+    "</div>\n" +
+    "<div ng-if=\"node.nodeData('type') === 'initial'\">\n" +
     "<div class=\"node-info-title\">\n" +
     "Requester\n" +
     "</div>\n" +
@@ -14154,11 +14183,6 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "</div>\n" +
     "</div>\n" +
     "<div ng-if=\"node.nodeData('type') !== 'initial'\">\n" +
-    "<div class=\"node-header-detail\">\n" +
-    "<span ng-if=\"node.nodeData('type') === 'Notified'\">\n" +
-    "{{node.nodeData('initiatedTimestamp') | momentAgo}}\n" +
-    "</span>\n" +
-    "</div>\n" +
     "<div class=\"node-info-title\">\n" +
     "Approver Name\n" +
     "</div>\n" +
@@ -14179,7 +14203,7 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "<span ng-if=\"node.nodeData('type') === 'Approved' || node.nodeData('type') === 'Denied'\">\n" +
     "{{node.nodeData('approvalTimestamp') | date : 'medium'}}\n" +
     "</span>\n" +
-    "<span ng-if=\"node.nodeData('type') === 'In Progress'\">\n" +
+    "<span ng-if=\"node.nodeData('type') === 'Notified'\">\n" +
     "--\n" +
     "</span>\n" +
     "</div>\n" +

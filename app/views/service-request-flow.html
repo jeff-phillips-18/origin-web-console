@@ -42,14 +42,23 @@
                            ng-attr-height="{{node.height()}}">
               <div class="node-card card-pf" ng-class="{'card-pf-accented': node.nodeData('type') === 'Notified'}">
                 <div class="card-pf-body">
+
                   <div class="node-status-icon {{node.nodeData('statusIconClass')}}"></div>
-                  <span class="node-header">
+
+                  <div class="node-header">
                     {{node.nodeData('title')}}
-                  </span>
-                  <div ng-if="node.nodeData('type') === 'initial'">
-                    <div class="node-header-detail" >
+                  </div>
+
+                  <div class="node-header-detail">
+                    <span ng-if="node.nodeData('type') === 'initial'">
                       {{service | displayName}}
-                    </div>
+                    </span>
+                    <span ng-if="node.nodeData('type') === 'Notified'">
+                      {{node.nodeData('initiatedTimestamp') | momentAgo }}
+                    </span>
+                  </div>
+
+                  <div ng-if="node.nodeData('type') === 'initial'">
                     <div class="node-info-title">
                       Requester
                     </div>
@@ -63,12 +72,8 @@
                       {{node.nodeData('initiatedTimestamp') | date : 'medium'}}
                     </div>
                   </div>
+
                   <div ng-if="node.nodeData('type') !== 'initial'">
-                    <div class="node-header-detail" >
-                      <span ng-if="node.nodeData('type') === 'Notified'">
-                      {{node.nodeData('initiatedTimestamp') | momentAgo}}
-                      </span>
-                    </div>
                     <div class="node-info-title">
                       Approver Name
                     </div>
@@ -89,7 +94,7 @@
                         <span ng-if="node.nodeData('type') === 'Approved' || node.nodeData('type') === 'Denied'">
                            {{node.nodeData('approvalTimestamp') | date : 'medium'}}
                         </span>
-                        <span ng-if="node.nodeData('type') === 'In Progress'">
+                        <span ng-if="node.nodeData('type') === 'Notified'">
                            --
                         </span>
                       </div>

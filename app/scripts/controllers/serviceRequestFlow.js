@@ -61,8 +61,9 @@ angular.module('openshiftConsole')
            requester: _.get(approvalStatus, 'requester'),
             initiatedTimestamp: _.get($scope.service, 'metadata.creationTimestamp'),
             width: 230,
-            height: 250,
-            yOffset: $scope.isMobile ? 0 : 25
+            height: 240,
+            xOffset: 0,
+            yOffset: 0
           }
         );
 
@@ -105,16 +106,20 @@ angular.module('openshiftConsole')
               initiatedTimestamp: parseInt(_.get(approvalStatus, 'approver_' + i + '_initiated_at')),
               approvalTimestamp: parseInt(_.get(approvalStatus, 'approver_' + i + '_approved_at')),
               width: 230,
-              height: 300
+              height: 290
             });
             $scope.data.connections.push(
               {
                 source: {
                   nodeID: i,
+                  xOffset: $scope.isMobile ? 115 : 230,
+                  yOffset: $scope.isMobile ? 300 : 90,
                   connectorIndex: $scope.isMobile ? 1 : 0
                 },
                 dest: {
                   nodeID: i + 1,
+                  xOffset: $scope.isMobile ? 115 : 0,
+                  yOffset: $scope.isMobile ? 0 : 90,
                   connectorIndex:  $scope.isMobile ? 1 : 0,
                   connectorClass: connectorClass
                 }
