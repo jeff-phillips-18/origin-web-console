@@ -51,7 +51,7 @@
 
                   <div class="node-header-detail">
                     <span ng-if="node.nodeData('type') === 'initial'">
-                      {{service | displayName}}
+                      {{node.nodeData('subTitle')}}
                     </span>
                     <span ng-if="node.nodeData('type') === 'Notified'">
                       {{node.nodeData('initiatedTimestamp') | momentAgo }}

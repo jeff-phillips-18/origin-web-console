@@ -14162,7 +14162,7 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "</div>\n" +
     "<div class=\"node-header-detail\">\n" +
     "<span ng-if=\"node.nodeData('type') === 'initial'\">\n" +
-    "{{service | displayName}}\n" +
+    "{{node.nodeData('subTitle')}}\n" +
     "</span>\n" +
     "<span ng-if=\"node.nodeData('type') === 'Notified'\">\n" +
     "{{node.nodeData('initiatedTimestamp') | momentAgo }}\n" +

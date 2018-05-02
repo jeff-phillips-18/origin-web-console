@@ -5282,16 +5282,16 @@ a.unwatchAll(u);
 });
 }));
 } ]), angular.module("openshiftConsole").controller("ServiceRequestFlowController", [ "$document", "$filter", "$location", "$scope", "$routeParams", "APIService", "AuthService", "ChartViewService", "DataService", "HTMLService", "Navigate", "ProjectsService", function(e, t, n, r, a, o, i, s, c, l, u, d) {
-var p = o.getPreferredVersion("configmaps"), m = o.getPreferredVersion("serviceinstances"), f = t("isIE")(), g = [];
+var p = o.getPreferredVersion("configmaps"), m = o.getPreferredVersion("serviceinstances"), f = t("displayName"), g = t("isIE")(), v = [];
 r.projectName = a.requestproject, r.serviceName = a.service, r.connectorSize = s.connectorSize;
-var v = function(e) {
+var h = function(e) {
 return jsyaml.safeLoad(e, {
 json: !0
 });
-}, h = function() {
-var e = r.service.metadata.uid + "-status";
-g.push(c.watchObject(p, e, r.context, function(e) {
-var t = _.get(e, "data.status"), n = t && v(t);
+}, y = function() {
+var e = r.service.spec.externalID + "-status";
+v.push(c.watchObject(p, e, r.context, function(e) {
+var t = _.get(e, "data.status"), n = t && h(t);
 r.data = {
 nodes: [],
 connections: []
@@ -5299,6 +5299,7 @@ connections: []
 id: 1,
 type: "initial",
 title: "Request Initiated",
+subTitle: n.service_name || f(r.service),
 statusIconClass: "pficon pficon-add-circle-o",
 requester: _.get(n, "requester"),
 initiatedTimestamp: _.get(r.service, "metadata.creationTimestamp"),
@@ -5319,8 +5320,8 @@ status: c,
 statusIconClass: o,
 approverName: _.get(n, "approver_" + a + "_name"),
 approverUrl: _.get(n, "approver_" + a + "_url"),
-initiatedTimestamp: parseInt(_.get(n, "approver_" + a + "_initiated_at")),
-approvalTimestamp: parseInt(_.get(n, "approver_" + a + "_approved_at")),
+initiatedTimestamp: _.get(n, "approver_" + a + "_initiated_at"),
+approvalTimestamp: _.get(n, "approver_" + a + "_approved_at"),
 width: 230,
 height: 290
 }), r.data.connections.push({
@@ -5341,31 +5342,31 @@ connectorClass: i
 }
 r.chart = s.createChartViewModel(r.data), r.loading = !1;
 }));
-}, y = function() {
-g.push(c.watchObject(m, r.serviceName, r.context, function(e) {
-r.service = e, h();
+}, b = function() {
+v.push(c.watchObject(m, r.serviceName, r.context, function(e) {
+r.service = e, y();
 }, {
-poll: f,
+poll: g,
 pollInterval: 6e4
 }));
 };
 r.foreignObjectSupported = e[0].implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#Extensibility", "1.1"), r.loading = !0, d.get(r.projectName).then(_.spread(function(e, t) {
-r.project = e, r.context = t, y();
+r.project = e, r.context = t, b();
 }, function(e) {
 u.toProjectList();
 }));
-var b = function() {
+var S = function() {
 return l.isWindowBelowBreakpoint(l.WINDOW_SIZE_SM);
 };
-r.isMobile = b();
-var S = _.throttle(function() {
-var e = b();
+r.isMobile = S();
+var C = _.throttle(function() {
+var e = S();
 e !== r.isMobile && r.$evalAsync(function() {
-r.isMobile = e, h();
+r.isMobile = e, y();
 });
 }, 50);
-$(window).on("resize.workflow", S), r.$on("$destroy", function() {
-c.unwatchAll(g), $(window).off(".workflow");
+$(window).on("resize.workflow", C), r.$on("$destroy", function() {
+c.unwatchAll(v), $(window).off(".workflow");
 });
 } ]), angular.module("openshiftConsole").controller("ProjectRequestsController", [ "$filter", "$location", "$scope", "$routeParams", "APIService", "AuthService", "DataService", "HomePagePreferenceService", "KeywordService", "Navigate", "ProjectsService", function(e, t, n, r, a, o, i, s, c, l, u) {
 var d, p, m = a.getPreferredVersion("configmaps"), f = a.getPreferredVersion("serviceinstances"), g = e("isIE")(), v = [], h = e("displayName");
@@ -5417,9 +5418,9 @@ return 0;
 }, C = function() {
 d && p && (n.pendingRequests = [], _.each(p, function(e) {
 if (_.get(e, "status.asyncOpInProgress")) {
-var t = e.metadata.uid + "-status", r = _.get(_.get(d, t), "data.status"), a = {};
+var t = e.spec.externalID + "-status", r = _.get(_.get(d, t), "data.status"), a = {};
 if (r) {
-(a = b(r)).serviceInstance = e, a.serviceInstanceName = h(e);
+(a = b(r)).serviceInstance = e, a.serviceInstanceName = a.service_name || h(e);
 var o = S(a);
 a && o && (a.requestTimestamp = _.get(e, "metadata.creationTimestamp"), a.approvalStatus = "Step " + o + " of " + a.num_approvers, a.approver = a["approver_" + o + "_name"], a.approvalRequestTimestamp = a["approver_" + o + "_initiated_at"]);
 } else a.serviceInstance = e, a.requester = "unknown";

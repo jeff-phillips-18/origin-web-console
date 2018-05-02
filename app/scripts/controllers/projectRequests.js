@@ -103,6 +103,7 @@ angular.module('openshiftConsole')
         return false;
       }
 
+      console.log(serviceInstance.metadata.name + " : " + serviceInstance.spec.externalID);
       var hasPendingApprover = function(approvalStatus) {
         for (var i = 1; i <= approvalStatus.num_approvers; i++) {
           var status = approvalStatus['approver_' + i + '_status'];
@@ -113,7 +114,7 @@ angular.module('openshiftConsole')
         return false;
       };
 
-      var approvalMapName = serviceInstance.metadata.uid + '-status';
+      var approvalMapName = serviceInstance.spec.externalID + '-status';
       var approvalStatusYAML = _.get(_.get(configMaps, approvalMapName), 'data.status');
 
       return approvalStatusYAML && hasPendingApprover(parseYAML(approvalStatusYAML));
@@ -127,13 +128,13 @@ angular.module('openshiftConsole')
       $scope.pendingRequests = [];
       _.each(serviceInstances, function(serviceInstance) {
         if (_.get(serviceInstance, 'status.asyncOpInProgress') || hasPendingConfigMap(serviceInstance)) {
-          var approvalMapName = serviceInstance.metadata.uid + '-status';
+          var approvalMapName = serviceInstance.spec.externalID + '-status';
           var approvalStatusYAML = _.get(_.get(configMaps, approvalMapName), 'data.status');
           var approvalStatus = {};
           if (approvalStatusYAML) {
             approvalStatus = parseYAML(approvalStatusYAML);
             approvalStatus.serviceInstance = serviceInstance;
-            approvalStatus.serviceInstanceName = displayFilter(serviceInstance);
+            approvalStatus.serviceInstanceName = approvalStatus.service_name || displayFilter(serviceInstance);
 
             var nextApprover = nextApproverCount(approvalStatus);
             if (approvalStatus && nextApprover) {

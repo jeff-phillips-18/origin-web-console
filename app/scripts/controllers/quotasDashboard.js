@@ -92,7 +92,7 @@ angular.module('openshiftConsole')
       }
 
       console.log("service instance: " + serviceInstance.metadata.name);
-      console.log(serviceInstance.metadata.uid);
+      console.log(serviceInstance.spec.externalID);
       var hasPendingApprover = function(approvalStatus) {
         for (var i = 1; i <= approvalStatus.num_approvers; i++) {
           var status = approvalStatus['approver_' + i + '_status'];

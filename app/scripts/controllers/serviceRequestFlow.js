@@ -23,6 +23,7 @@ angular.module('openshiftConsole')
                                                        ProjectsService) {
     var configMapsVersion = APIService.getPreferredVersion('configmaps');
     var serviceInstancesVersion = APIService.getPreferredVersion('serviceinstances');
+    var displayFilter = $filter('displayName');
 
     var limitWatches = $filter('isIE')();
     var DEFAULT_POLL_INTERVAL = 60 * 1000; // milliseconds
@@ -42,7 +43,7 @@ angular.module('openshiftConsole')
 
     var updatePendingRequest = function() {
       // Get the pending request config map
-      var approvalMapName = $scope.service.metadata.uid + '-status';
+      var approvalMapName = $scope.service.spec.externalID + '-status';
       watches.push(DataService.watchObject(configMapsVersion, approvalMapName, $scope.context, function(configMap) {
         var approvalStatusYAML = _.get(configMap, 'data.status');
         var approvalStatus = approvalStatusYAML && parseYAML(approvalStatusYAML);
@@ -57,8 +58,9 @@ angular.module('openshiftConsole')
             id: 1,
             type: 'initial',
             title: 'Request Initiated',
+            subTitle: approvalStatus.service_name || displayFilter($scope.service),
             statusIconClass: 'pficon pficon-add-circle-o',
-           requester: _.get(approvalStatus, 'requester'),
+            requester: _.get(approvalStatus, 'requester'),
             initiatedTimestamp: _.get($scope.service, 'metadata.creationTimestamp'),
             width: 230,
             height: 240,
@@ -103,8 +105,8 @@ angular.module('openshiftConsole')
               statusIconClass: statusIconClass,
               approverName: _.get(approvalStatus, 'approver_' + i + '_name'),
               approverUrl: _.get(approvalStatus, 'approver_' + i + '_url'),
-              initiatedTimestamp: parseInt(_.get(approvalStatus, 'approver_' + i + '_initiated_at')),
-              approvalTimestamp: parseInt(_.get(approvalStatus, 'approver_' + i + '_approved_at')),
+              initiatedTimestamp: _.get(approvalStatus, 'approver_' + i + '_initiated_at'),
+              approvalTimestamp: _.get(approvalStatus, 'approver_' + i + '_approved_at'),
               width: 230,
               height: 290
             });
