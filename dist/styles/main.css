@@ -6209,7 +6209,7 @@ alerts+.chromeless .log-loading-msg{margin-top:130px}
 .order-workflow-container.shaded{background-color:#ededed}
 .order-workflow-container .node-card{height:100%;margin:0;width:100%}
 .order-workflow-container .node-header{display:table;font-size:24px;font-weight:200;text-align:center;width:100%}
-.order-workflow-container .node-header-detail{display:table;font-size:12px;height:20px;margin-bottom:10px;text-align:center;width:100%}
+.order-workflow-container .node-header-detail{font-size:12px;height:20px;margin-bottom:10px;text-align:center;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;width:100%}
 .order-workflow-container .node-status-icon{color:#bbb;font-size:42px;text-align:center;width:100%}
 .order-workflow-container .node-status-icon.pficon-orders{color:#3f9c35}
 .order-workflow-container .node-info-title{font-weight:700;margin-left:20px;margin-top:10px}

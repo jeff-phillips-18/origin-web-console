@@ -5282,17 +5282,18 @@ a.unwatchAll(u);
 });
 }));
 } ]), angular.module("openshiftConsole").controller("ServiceRequestFlowController", [ "$document", "$filter", "$location", "$scope", "$routeParams", "APIService", "AuthService", "ChartViewService", "DataService", "HTMLService", "Navigate", "ProjectsService", function(e, t, n, r, a, o, i, s, c, l, u, d) {
-var p = o.getPreferredVersion("configmaps"), m = o.getPreferredVersion("serviceinstances"), f = t("displayName"), g = t("isIE")(), v = [];
+var p = o.getPreferredVersion("configmaps"), m = o.getPreferredVersion("serviceinstances"), f = t("displayName"), g = t("isIE")(), v = t("momentAgo"), h = t("date"), y = [];
 r.projectName = a.requestproject, r.serviceName = a.service, r.connectorSize = s.connectorSize;
-var h = function(e) {
+var b = function(e) {
 return jsyaml.safeLoad(e, {
 json: !0
 });
-}, y = function() {
+}, S = function() {
 var e = r.service.spec.externalID + "-status";
-v.push(c.watchObject(p, e, r.context, function(e) {
-var t = _.get(e, "data.status"), n = t && h(t);
-r.data = {
+y.push(c.watchObject(p, e, r.context, function(e) {
+var t = _.get(e, "data.status"), n = t && b(t);
+if (n) {
+r.requestServiceName = _.get(n, "service_name"), r.data = {
 nodes: [],
 connections: []
 }, r.data.nodes.push({
@@ -5300,73 +5301,97 @@ id: 1,
 type: "initial",
 title: "Request Initiated",
 subTitle: n.service_name || f(r.service),
-statusIconClass: "pficon pficon-add-circle-o",
+statusIconClass: "pficon pficon-user",
 requester: _.get(n, "requester"),
 initiatedTimestamp: _.get(r.service, "metadata.creationTimestamp"),
 width: 230,
-height: 240,
-xOffset: 0,
-yOffset: 0
+height: 240
 });
-for (var a = 1; a <= n.num_approvers; a++) {
-var o, i, c = _.get(n, "approver_" + a + "_status"), l = c;
-"Approved" === c ? (o = "pficon pficon-orders", "approved", i = "approved") : "Notified" === c ? (l = "In Progress", o = "fa fa-spinner", i = "in-progress") : "Pending" === c ? (o = "pficon pficon-pending", i = "pending") : "Denied" === c ? (o = "pficon pficon-error-circle-o", i = "denied") : "Skipped" === c && (o = "fa fa-step-forward", i = "skipped"), r.data.nodes.push({
-id: a + 1,
-type: c,
-title: l,
-parentId: r.isMobile ? void 0 : a,
-prevSiblingId: r.isMobile ? a : void 0,
-status: c,
-statusIconClass: o,
-approverName: _.get(n, "approver_" + a + "_name"),
-approverUrl: _.get(n, "approver_" + a + "_url"),
-initiatedTimestamp: _.get(n, "approver_" + a + "_initiated_at"),
-approvalTimestamp: _.get(n, "approver_" + a + "_approved_at"),
+for (var a, o, i, c, l, u = _.size(n.quota_approver_url) > 0, d = 1; d <= n.num_approvers; d++) o = a = _.get(n, "approver_" + d + "_status"), i = void 0, c = void 0, l = void 0, "Approved" === a ? (i = h(_.get(n, "approver_" + d + "_approved_at"), "medium"), c = "pficon pficon-orders", l = "approved") : "Notified" === a ? (o = "In Progress", i = v(_.get(n, "approver_" + d + "_initiated_at")), c = "fa fa-spinner", l = "in-progress") : "Pending" === a ? (c = "pficon pficon-pending", l = "pending") : "Denied" === a ? (i = h(_.get(n, "approver_" + d + "_approved_at"), "medium"), c = "pficon pficon-error-circle-o", l = "denied") : "Skipped" === a && (c = "fa fa-step-forward", l = "skipped"), r.data.nodes.push({
+id: d + 1,
+type: a,
+title: o,
+subTitle: i,
+parentId: r.isMobile ? void 0 : d,
+prevSiblingId: r.isMobile ? d : void 0,
+status: a,
+statusIconClass: c,
+approverName: _.get(n, "approver_" + d + "_name"),
+approverUrl: _.get(n, "approver_" + d + "_url"),
+initiatedTimestamp: _.get(n, "approver_" + d + "_initiated_at"),
 width: 230,
-height: 290
+height: 240
 }), r.data.connections.push({
 source: {
-nodeID: a,
+nodeID: d,
 xOffset: r.isMobile ? 115 : 230,
-yOffset: r.isMobile ? 300 : 90,
+yOffset: r.isMobile ? 120 : 90,
 connectorIndex: r.isMobile ? 1 : 0
 },
 dest: {
-nodeID: a + 1,
+nodeID: d + 1,
 xOffset: r.isMobile ? 115 : 0,
 yOffset: r.isMobile ? 0 : 90,
 connectorIndex: r.isMobile ? 1 : 0,
-connectorClass: i
+connectorClass: l
 }
 });
+u && (o = a = _.get(n, "quota_approver_status"), i = void 0, c = void 0, l = void 0, "Approved" === a ? (i = h(_.get(n, "quota_approver_approved_at"), "medium"), c = "pficon pficon-orders", l = "approved") : "Notified" === a ? (o = "In Progress", i = v(_.get(n, "quota_approver_approved_at")), c = "fa fa-spinner", l = "in-progress") : "Pending" === a ? (c = "pficon pficon-pending", l = "pending") : "Denied" === a ? (i = h(_.get(n, "quota_approver_approved_at"), "medium"), c = "pficon pficon-error-circle-o", l = "denied") : "Skipped" === a && (c = "fa fa-step-forward", l = "skipped"), r.data.nodes.push({
+id: d + 1,
+type: a,
+title: o,
+subTitle: i,
+parentId: r.isMobile ? void 0 : d,
+prevSiblingId: r.isMobile ? d : void 0,
+status: a,
+statusIconClass: c,
+approverName: _.get(n, "quota_approver_name"),
+approverUrl: _.get(n, "quota_approver_url"),
+initiatedTimestamp: _.get(n, "quota_approver_initiated_at"),
+width: 230,
+height: 240
+}), r.data.connections.push({
+source: {
+nodeID: d,
+xOffset: r.isMobile ? 115 : 230,
+yOffset: r.isMobile ? 120 : 90,
+connectorIndex: r.isMobile ? 1 : 0
+},
+dest: {
+nodeID: d + 1,
+xOffset: r.isMobile ? 115 : 0,
+yOffset: r.isMobile ? 0 : 90,
+connectorIndex: r.isMobile ? 1 : 0,
+connectorClass: l
 }
-r.chart = s.createChartViewModel(r.data), r.loading = !1;
+})), r.chart = s.createChartViewModel(r.data), r.loading = !1;
+}
 }));
-}, b = function() {
-v.push(c.watchObject(m, r.serviceName, r.context, function(e) {
-r.service = e, y();
+}, C = function() {
+y.push(c.watchObject(m, r.serviceName, r.context, function(e) {
+r.service = e, S();
 }, {
 poll: g,
 pollInterval: 6e4
 }));
 };
 r.foreignObjectSupported = e[0].implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#Extensibility", "1.1"), r.loading = !0, d.get(r.projectName).then(_.spread(function(e, t) {
-r.project = e, r.context = t, b();
+r.project = e, r.context = t, C();
 }, function(e) {
 u.toProjectList();
 }));
-var S = function() {
+var w = function() {
 return l.isWindowBelowBreakpoint(l.WINDOW_SIZE_SM);
 };
-r.isMobile = S();
-var C = _.throttle(function() {
-var e = S();
+r.isMobile = w();
+var P = _.throttle(function() {
+var e = w();
 e !== r.isMobile && r.$evalAsync(function() {
-r.isMobile = e, y();
+r.isMobile = e, S();
 });
 }, 50);
-$(window).on("resize.workflow", C), r.$on("$destroy", function() {
-c.unwatchAll(v), $(window).off(".workflow");
+$(window).on("resize.workflow", P), r.$on("$destroy", function() {
+c.unwatchAll(y), $(window).off(".workflow");
 });
 } ]), angular.module("openshiftConsole").controller("ProjectRequestsController", [ "$filter", "$location", "$scope", "$routeParams", "APIService", "AuthService", "DataService", "HomePagePreferenceService", "KeywordService", "Navigate", "ProjectsService", function(e, t, n, r, a, o, i, s, c, l, u) {
 var d, p, m = a.getPreferredVersion("configmaps"), f = a.getPreferredVersion("serviceinstances"), g = e("isIE")(), v = [], h = e("displayName");
@@ -5412,18 +5437,21 @@ var b = function(e) {
 return jsyaml.safeLoad(e, {
 json: !0
 });
-}, S = function(e) {
-for (var t = 1; t <= e.num_approvers; t++) if ("Notified" === e["approver_" + t + "_status"]) return t;
+}, S = function(e, t) {
+for (var n = 1; n <= e.num_approvers; n++) if (e["approver_" + n + "_status"] === t) return n;
 return 0;
 }, C = function() {
 d && p && (n.pendingRequests = [], _.each(p, function(e) {
-if (_.get(e, "status.asyncOpInProgress")) {
+if (_.get(e, "status.asyncOpInProgress"), !0) {
 var t = e.spec.externalID + "-status", r = _.get(_.get(d, t), "data.status"), a = {};
 if (r) {
-(a = b(r)).serviceInstance = e, a.serviceInstanceName = a.service_name || h(e);
-var o = S(a);
-a && o && (a.requestTimestamp = _.get(e, "metadata.creationTimestamp"), a.approvalStatus = "Step " + o + " of " + a.num_approvers, a.approver = a["approver_" + o + "_name"], a.approvalRequestTimestamp = a["approver_" + o + "_initiated_at"]);
-} else a.serviceInstance = e, a.requester = "unknown";
+(a = b(r)).serviceInstance = e, a.serviceInstanceName = a.service_name || h(e), a.requestTimestamp = _.get(e, "metadata.creationTimestamp"), a.approvalStatus = "Approved";
+var o = _.size(a.quota_approver_url) > 0, i = parseInt(a.num_approvers) + (o ? 1 : 0), s = S(a, "Notified");
+if (s) a.approvalStatus = "Step " + s + " of " + i, a.approver = a["approver_" + s + "_name"], a.approvalRequestTimestamp = a["approver_" + s + "_initiated_at"]; else {
+var c = S(a, "Denied");
+c ? (a.approvalStatus = "Denied", a.approver = a["approver_" + c + "_name"], a.approvalRequestTimestamp = a["approver_" + c + "_approved_at"]) : o && "Pending" === a.quota_appprover_status && (a.approvalStatus = "Step " + i + " of " + i, a.approver = a.quota_approver_name, a.approvalRequestTimestamp = a.quota_approver_initated_at);
+}
+} else a.serviceInstance = e, a.requester = "unknown", console.log(e.metadata.name + " : " + e.spec.externalID);
 n.pendingRequests.push(a);
 }
 }), y());
@@ -5471,11 +5499,21 @@ u = e;
 return jsyaml.safeLoad(e, {
 json: !0
 });
-}, C = function(e) {
+}, C = function(e, t) {
+console.log("service instance: " + t.metadata.name), console.log(t.spec.externalID);
+var n = t.spec.externalID + "-status", r = _.get(_.get(e.configMaps, n), "data.status");
+return r && function(e) {
+for (var t = 1; t <= e.num_approvers; t++) {
+var n = e["approver_" + t + "_status"];
+if ("Notified" === n || "Pending" === n) return !0;
+}
+return !1;
+}(S(r));
+}, w = function(e) {
 e.configMaps && e.serviceInstances && (e.pendingRequestsCount = 0, e.pendingRequests = [], _.each(e.serviceInstances, function(t) {
-_.get(t, "status.asyncOpInProgress") && e.pendingRequestsCount++;
+(_.get(t, "status.asyncOpInProgress") || C(e, t)) && e.pendingRequestsCount++;
 }));
-}, w = function() {
+}, P = function() {
 if (c) {
 b(), h();
 var e = !0, n = !0, r = 0, o = 0;
@@ -5486,11 +5524,11 @@ namespace: i.metadata.name
 f.push(a.watch(d, s, function(a) {
 i.configMaps = a.by("metadata.name");
 var o = _.get(i.configMaps, "redhat-quota.data.quota");
-o ? (i.quotaData = S(o), C(i)) : _.remove(t.projects, function(e) {
+o ? (i.quotaData = S(o), w(i)) : _.remove(t.projects, function(e) {
 return e === i;
 }), ++r >= _.size(t.projects) && (e = !1, t.loading = t.loading && (n || e));
 })), f.push(a.watch(p, s, function(r) {
-i.serviceInstances = r.by("metadata.name"), C(i), ++o >= _.size(t.projects) && (n = !1, t.loading = t.loading && (n || e));
+i.serviceInstances = r.by("metadata.name"), w(i), ++o >= _.size(t.projects) && (n = !1, t.loading = t.loading && (n || e));
 }, {
 poll: m,
 pollInterval: 6e4
@@ -5524,15 +5562,15 @@ title: "Creation Date",
 sortType: "alpha"
 } ],
 isAscending: !0,
-onSortChange: w
+onSortChange: P
 };
-var P = function(e) {
-c = _.toArray(e.by("metadata.name")), w();
+var j = function(e) {
+c = _.toArray(e.by("metadata.name")), P();
 };
 t.$watch("search.text", _.debounce(function(e) {
 t.keywords = g = o.generateKeywords(e), t.$applyAsync(h);
 }, 350)), t.loading = !0, f.push(s.watch(t, function(e) {
-P(e);
+j(e);
 })), t.$on("$destroy", function() {
 a.unwatchAll(f);
 });

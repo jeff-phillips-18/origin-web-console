@@ -20,7 +20,7 @@ angular.module('openshiftConsole')
                                                     KeywordService,
                                                     Navigate,
                                                     ProjectsService) {
-    var debug = false;
+    var debug = true;
 
     var configMapsVersion = APIService.getPreferredVersion('configmaps');
     var serviceInstancesVersion = APIService.getPreferredVersion('serviceinstances');
@@ -136,10 +136,14 @@ angular.module('openshiftConsole')
             approvalStatus.serviceInstance = serviceInstance;
             approvalStatus.serviceInstanceName = approvalStatus.service_name || displayFilter(serviceInstance);
             approvalStatus.requestTimestamp = _.get(serviceInstance, 'metadata.creationTimestamp');
+            approvalStatus.approvalStatus = 'Approved';
 
+            var useQuotaApprover = _.size(approvalStatus.quota_approver_url) > 0;
+            var approverCount = parseInt(approvalStatus.num_approvers) + (useQuotaApprover ? 1 : 0);
             var nextApprover = nextApproverCount(approvalStatus, 'Notified');
+
             if (nextApprover) {
-              approvalStatus.approvalStatus = 'Step ' + nextApprover + ' of ' + approvalStatus.num_approvers;
+              approvalStatus.approvalStatus = 'Step ' + nextApprover + ' of ' + approverCount;
               approvalStatus.approver = approvalStatus['approver_' + nextApprover + '_name'];
               approvalStatus.approvalRequestTimestamp = approvalStatus['approver_' + nextApprover + '_initiated_at'];
             } else {
@@ -148,8 +152,12 @@ angular.module('openshiftConsole')
                 approvalStatus.approvalStatus = 'Denied';
                 approvalStatus.approver = approvalStatus['approver_' + denier + '_name'];
                 approvalStatus.approvalRequestTimestamp = approvalStatus['approver_' + denier + '_approved_at'];
-              } else {
-                approvalStatus.approvalStatus = 'Approved';
+              } else if (useQuotaApprover) {
+                if (approvalStatus.quota_appprover_status === 'Pending') {
+                  approvalStatus.approvalStatus = 'Step ' + approverCount + ' of ' + approverCount;
+                  approvalStatus.approver = approvalStatus.quota_approver_name;
+                  approvalStatus.approvalRequestTimestamp = approvalStatus.quota_approver_initated_at;
+                }
               }
             }
           } else {

@@ -14139,7 +14139,7 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "<a href=\"quotas/requests/{{project.metadata.name}}\">Pending Requests</a>\n" +
     "</li>\n" +
     "<li>\n" +
-    "<strong>{{service | displayName}}</strong>\n" +
+    "<strong>{{requestServiceName || (service | displayName)}}</strong>\n" +
     "</li>\n" +
     "</ol>\n" +
     "</div>\n" +
@@ -14161,12 +14161,7 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "{{node.nodeData('title')}}\n" +
     "</div>\n" +
     "<div class=\"node-header-detail\">\n" +
-    "<span ng-if=\"node.nodeData('type') === 'initial'\">\n" +
     "{{node.nodeData('subTitle')}}\n" +
-    "</span>\n" +
-    "<span ng-if=\"node.nodeData('type') === 'Notified'\">\n" +
-    "{{node.nodeData('initiatedTimestamp') | momentAgo }}\n" +
-    "</span>\n" +
     "</div>\n" +
     "<div ng-if=\"node.nodeData('type') === 'initial'\">\n" +
     "<div class=\"node-info-title\">\n" +
@@ -14195,17 +14190,6 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "</div>\n" +
     "<div class=\"node-info-item\">\n" +
     "{{node.nodeData('initiatedTimestamp') | date : 'medium'}}\n" +
-    "</div>\n" +
-    "<div class=\"node-info-title\">\n" +
-    "{{node.nodeData('type') === 'Denied' ? 'Denied' : 'Approved'}}\n" +
-    "</div>\n" +
-    "<div class=\"node-info-item\">\n" +
-    "<span ng-if=\"node.nodeData('type') === 'Approved' || node.nodeData('type') === 'Denied'\">\n" +
-    "{{node.nodeData('approvalTimestamp') | date : 'medium'}}\n" +
-    "</span>\n" +
-    "<span ng-if=\"node.nodeData('type') === 'Notified'\">\n" +
-    "--\n" +
-    "</span>\n" +
     "</div>\n" +
     "</div>\n" +
     "</div>\n" +

@@ -17,7 +17,7 @@ angular.module('openshiftConsole')
                                                      KeywordService,
                                                      Navigate,
                                                      ProjectsService) {
-    var debug = false;
+    var debug = true;
 
     var configMapsVersion = APIService.getPreferredVersion('configmaps');
     var serviceInstancesVersion = APIService.getPreferredVersion('serviceinstances');

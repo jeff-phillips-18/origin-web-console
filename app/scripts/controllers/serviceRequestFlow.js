@@ -77,18 +77,23 @@ angular.module('openshiftConsole')
           }
         );
 
+        var status;
+        var title;
+        var subTitle;
+        var statusIconClass;
+        var connectorClass;
+        var useQuotaApprover = _.size(approvalStatus.quota_approver_url) > 0;
+
         for (var i = 1; i <= approvalStatus.num_approvers; i++) {
-          var status = _.get(approvalStatus, 'approver_' + i + '_status');
-          var title = status;
-          var subTitle = undefined;
-          var statusIconClass = undefined;
-          var connectorClass = undefined;
-          var sourceConnectorClass = undefined;
+          status = _.get(approvalStatus, 'approver_' + i + '_status');
+          title = status;
+          subTitle = undefined;
+          statusIconClass = undefined;
+          connectorClass = undefined;
 
           if (status === 'Approved') {
             subTitle = dateFilter(_.get(approvalStatus, 'approver_' + i + '_approved_at'), 'medium');
             statusIconClass = 'pficon pficon-orders';
-            sourceConnectorClass = 'approved';
             connectorClass = 'approved';
           } else if (status === 'Notified') {
             title = 'In Progress';
@@ -140,6 +145,70 @@ angular.module('openshiftConsole')
                 }
               }
             );
+        }
+
+        if (useQuotaApprover) {
+          status = _.get(approvalStatus, 'quota_approver_status');
+          title = status;
+          subTitle = undefined;
+          statusIconClass = undefined;
+          connectorClass = undefined;
+
+          if (status === 'Approved') {
+            subTitle = dateFilter(_.get(approvalStatus, 'quota_approver_approved_at'), 'medium');
+            statusIconClass = 'pficon pficon-orders';
+            connectorClass = 'approved';
+          } else if (status === 'Notified') {
+            title = 'In Progress';
+            subTitle = momentAgoFilter(_.get(approvalStatus, 'quota_approver_approved_at'));
+            statusIconClass = 'fa fa-spinner';
+            connectorClass = 'in-progress';
+          } else if (status === 'Pending') {
+            statusIconClass = 'pficon pficon-pending';
+            connectorClass = 'pending';
+          } else if (status === 'Denied') {
+            subTitle = dateFilter(_.get(approvalStatus, 'quota_approver_approved_at'), 'medium');
+            statusIconClass = 'pficon pficon-error-circle-o';
+            connectorClass = 'denied';
+          } else if (status === 'Skipped') {
+            statusIconClass= 'fa fa-step-forward';
+            connectorClass = 'skipped';
+          }
+
+          $scope.data.nodes.push(
+            {
+              id: i + 1,
+              type: status,
+              title: title,
+              subTitle: subTitle,
+              parentId: $scope.isMobile ? undefined : i,
+              prevSiblingId: $scope.isMobile ? i : undefined,
+              status: status,
+              statusIconClass: statusIconClass,
+              approverName: _.get(approvalStatus, 'quota_approver_name'),
+              approverUrl: _.get(approvalStatus, 'quota_approver_url'),
+              initiatedTimestamp: _.get(approvalStatus, 'quota_approver_initiated_at'),
+              width: CARD_WIDTH,
+              height: CARD_HEIGHT
+            });
+          $scope.data.connections.push(
+            {
+              source: {
+                nodeID: i,
+                xOffset: $scope.isMobile ? (CARD_WIDTH / 2) : CARD_WIDTH,
+                yOffset: $scope.isMobile ? (CARD_HEIGHT / 2) : 90,
+                connectorIndex: $scope.isMobile ? 1 : 0
+              },
+              dest: {
+                nodeID: i + 1,
+                xOffset: $scope.isMobile ? (CARD_WIDTH / 2) : 0,
+                yOffset: $scope.isMobile ? 0 : 90,
+                connectorIndex:  $scope.isMobile ? 1 : 0,
+                connectorClass: connectorClass
+              }
+            }
+          );
+
         }
         $scope.chart = ChartViewService.createChartViewModel($scope.data);
         $scope.loading = false;
