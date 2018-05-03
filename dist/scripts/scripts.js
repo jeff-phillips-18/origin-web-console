@@ -5442,7 +5442,7 @@ for (var n = 1; n <= e.num_approvers; n++) if (e["approver_" + n + "_status"] ==
 return 0;
 }, C = function() {
 d && p && (n.pendingRequests = [], _.each(p, function(e) {
-if (_.get(e, "status.asyncOpInProgress"), !0) {
+if (_.get(e, "status.asyncOpInProgress")) {
 var t = e.spec.externalID + "-status", r = _.get(_.get(d, t), "data.status"), a = {};
 if (r) {
 (a = b(r)).serviceInstance = e, a.serviceInstanceName = a.service_name || h(e), a.requestTimestamp = _.get(e, "metadata.creationTimestamp"), a.approvalStatus = "Approved";
@@ -5451,7 +5451,7 @@ if (s) a.approvalStatus = "Step " + s + " of " + i, a.approver = a["approver_" +
 var c = S(a, "Denied");
 c ? (a.approvalStatus = "Denied", a.approver = a["approver_" + c + "_name"], a.approvalRequestTimestamp = a["approver_" + c + "_approved_at"]) : o && "Pending" === a.quota_appprover_status && (a.approvalStatus = "Step " + i + " of " + i, a.approver = a.quota_approver_name, a.approvalRequestTimestamp = a.quota_approver_initated_at);
 }
-} else a.serviceInstance = e, a.requester = "unknown", console.log(e.metadata.name + " : " + e.spec.externalID);
+} else a.serviceInstance = e, a.requester = "unknown";
 n.pendingRequests.push(a);
 }
 }), y());
@@ -5499,21 +5499,11 @@ u = e;
 return jsyaml.safeLoad(e, {
 json: !0
 });
-}, C = function(e, t) {
-console.log("service instance: " + t.metadata.name), console.log(t.spec.externalID);
-var n = t.spec.externalID + "-status", r = _.get(_.get(e.configMaps, n), "data.status");
-return r && function(e) {
-for (var t = 1; t <= e.num_approvers; t++) {
-var n = e["approver_" + t + "_status"];
-if ("Notified" === n || "Pending" === n) return !0;
-}
-return !1;
-}(S(r));
-}, w = function(e) {
+}, C = function(e) {
 e.configMaps && e.serviceInstances && (e.pendingRequestsCount = 0, e.pendingRequests = [], _.each(e.serviceInstances, function(t) {
-(_.get(t, "status.asyncOpInProgress") || C(e, t)) && e.pendingRequestsCount++;
+_.get(t, "status.asyncOpInProgress") && e.pendingRequestsCount++;
 }));
-}, P = function() {
+}, w = function() {
 if (c) {
 b(), h();
 var e = !0, n = !0, r = 0, o = 0;
@@ -5524,11 +5514,11 @@ namespace: i.metadata.name
 f.push(a.watch(d, s, function(a) {
 i.configMaps = a.by("metadata.name");
 var o = _.get(i.configMaps, "redhat-quota.data.quota");
-o ? (i.quotaData = S(o), w(i)) : _.remove(t.projects, function(e) {
+o ? (i.quotaData = S(o), C(i)) : _.remove(t.projects, function(e) {
 return e === i;
 }), ++r >= _.size(t.projects) && (e = !1, t.loading = t.loading && (n || e));
 })), f.push(a.watch(p, s, function(r) {
-i.serviceInstances = r.by("metadata.name"), w(i), ++o >= _.size(t.projects) && (n = !1, t.loading = t.loading && (n || e));
+i.serviceInstances = r.by("metadata.name"), C(i), ++o >= _.size(t.projects) && (n = !1, t.loading = t.loading && (n || e));
 }, {
 poll: m,
 pollInterval: 6e4
@@ -5562,15 +5552,15 @@ title: "Creation Date",
 sortType: "alpha"
 } ],
 isAscending: !0,
-onSortChange: P
+onSortChange: w
 };
-var j = function(e) {
-c = _.toArray(e.by("metadata.name")), P();
+var P = function(e) {
+c = _.toArray(e.by("metadata.name")), w();
 };
 t.$watch("search.text", _.debounce(function(e) {
 t.keywords = g = o.generateKeywords(e), t.$applyAsync(h);
 }, 350)), t.loading = !0, f.push(s.watch(t, function(e) {
-j(e);
+P(e);
 })), t.$on("$destroy", function() {
 a.unwatchAll(f);
 });
