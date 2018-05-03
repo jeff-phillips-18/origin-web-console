@@ -103,7 +103,7 @@ angular.module('openshiftConsole')
         return false;
       };
 
-      var approvalMapName = serviceInstance.metadata.uid + '-status';
+      var approvalMapName = serviceInstance.spec.externalID + '-status';
       var approvalStatusYAML = _.get(_.get(project.configMaps, approvalMapName), 'data.status');
 
       return approvalStatusYAML && hasPendingApprover(parseYAML(approvalStatusYAML));

@@ -89,9 +89,9 @@ angular.module('openshiftConsole')
       });
     };
 
-    var nextApproverCount = function(approvalStatus) {
+    var nextApproverCount = function(approvalStatus, status) {
       for (var i = 1; i <= approvalStatus.num_approvers; i++) {
-        if (approvalStatus['approver_' + i + '_status'] === 'Notified') {
+        if (approvalStatus['approver_' + i + '_status'] === status) {
           return i;
         }
       }
@@ -127,7 +127,7 @@ angular.module('openshiftConsole')
 
       $scope.pendingRequests = [];
       _.each(serviceInstances, function(serviceInstance) {
-        if (_.get(serviceInstance, 'status.asyncOpInProgress') || hasPendingConfigMap(serviceInstance)) {
+        if (_.get(serviceInstance, 'status.asyncOpInProgress') || debug) {
           var approvalMapName = serviceInstance.spec.externalID + '-status';
           var approvalStatusYAML = _.get(_.get(configMaps, approvalMapName), 'data.status');
           var approvalStatus = {};
@@ -135,17 +135,29 @@ angular.module('openshiftConsole')
             approvalStatus = parseYAML(approvalStatusYAML);
             approvalStatus.serviceInstance = serviceInstance;
             approvalStatus.serviceInstanceName = approvalStatus.service_name || displayFilter(serviceInstance);
+            approvalStatus.requestTimestamp = _.get(serviceInstance, 'metadata.creationTimestamp');
 
-            var nextApprover = nextApproverCount(approvalStatus);
-            if (approvalStatus && nextApprover) {
-              approvalStatus.requestTimestamp = _.get(serviceInstance, 'metadata.creationTimestamp');
+            var nextApprover = nextApproverCount(approvalStatus, 'Notified');
+            if (nextApprover) {
               approvalStatus.approvalStatus = 'Step ' + nextApprover + ' of ' + approvalStatus.num_approvers;
               approvalStatus.approver = approvalStatus['approver_' + nextApprover + '_name'];
               approvalStatus.approvalRequestTimestamp = approvalStatus['approver_' + nextApprover + '_initiated_at'];
+            } else {
+              var denier = nextApproverCount(approvalStatus, 'Denied');
+              if (denier) {
+                approvalStatus.approvalStatus = 'Denied';
+                approvalStatus.approver = approvalStatus['approver_' + denier + '_name'];
+                approvalStatus.approvalRequestTimestamp = approvalStatus['approver_' + denier + '_approved_at'];
+              } else {
+                approvalStatus.approvalStatus = 'Approved';
+              }
             }
           } else {
             approvalStatus.serviceInstance = serviceInstance;
             approvalStatus.requester = "unknown";
+            if (debug) {
+              console.log(serviceInstance.metadata.name + " : " + serviceInstance.spec.externalID);
+            }
           }
           $scope.pendingRequests.push(approvalStatus);
         }

@@ -12,7 +12,7 @@
           <a href="quotas/requests/{{project.metadata.name}}">Pending Requests</a>
         </li>
         <li>
-          <strong>{{service | displayName}}</strong>
+          <strong>{{requestServiceName || (service | displayName)}}</strong>
         </li>
       </ol>
     </div>
@@ -50,12 +50,7 @@
                   </div>
 
                   <div class="node-header-detail">
-                    <span ng-if="node.nodeData('type') === 'initial'">
-                      {{node.nodeData('subTitle')}}
-                    </span>
-                    <span ng-if="node.nodeData('type') === 'Notified'">
-                      {{node.nodeData('initiatedTimestamp') | momentAgo }}
-                    </span>
+                    {{node.nodeData('subTitle')}}
                   </div>
 
                   <div ng-if="node.nodeData('type') === 'initial'">
@@ -86,17 +81,6 @@
                       </div>
                       <div class="node-info-item">
                         {{node.nodeData('initiatedTimestamp') | date : 'medium'}}
-                      </div>
-                      <div class="node-info-title">
-                        {{node.nodeData('type') === 'Denied' ? 'Denied' : 'Approved'}}
-                      </div>
-                      <div class="node-info-item">
-                        <span ng-if="node.nodeData('type') === 'Approved' || node.nodeData('type') === 'Denied'">
-                           {{node.nodeData('approvalTimestamp') | date : 'medium'}}
-                        </span>
-                        <span ng-if="node.nodeData('type') === 'Notified'">
-                           --
-                        </span>
                       </div>
                     </div>
                   </div>

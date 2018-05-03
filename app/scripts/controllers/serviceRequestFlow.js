@@ -26,7 +26,13 @@ angular.module('openshiftConsole')
     var displayFilter = $filter('displayName');
 
     var limitWatches = $filter('isIE')();
+    var momentAgoFilter = $filter('momentAgo');
+    var dateFilter = $filter('date');
+
     var DEFAULT_POLL_INTERVAL = 60 * 1000; // milliseconds
+
+    var CARD_WIDTH = 230;
+    var CARD_HEIGHT = 240;
 
     var watches = [];
 
@@ -47,7 +53,11 @@ angular.module('openshiftConsole')
       watches.push(DataService.watchObject(configMapsVersion, approvalMapName, $scope.context, function(configMap) {
         var approvalStatusYAML = _.get(configMap, 'data.status');
         var approvalStatus = approvalStatusYAML && parseYAML(approvalStatusYAML);
+        if (!approvalStatus) {
+          return;
+        }
 
+        $scope.requestServiceName = _.get(approvalStatus, "service_name");
         $scope.data = {
           nodes: [],
           connections: []
@@ -59,34 +69,37 @@ angular.module('openshiftConsole')
             type: 'initial',
             title: 'Request Initiated',
             subTitle: approvalStatus.service_name || displayFilter($scope.service),
-            statusIconClass: 'pficon pficon-add-circle-o',
+            statusIconClass: 'pficon pficon-user',
             requester: _.get(approvalStatus, 'requester'),
             initiatedTimestamp: _.get($scope.service, 'metadata.creationTimestamp'),
-            width: 230,
-            height: 240,
-            xOffset: 0,
-            yOffset: 0
+            width: CARD_WIDTH,
+            height: CARD_HEIGHT
           }
         );
 
         for (var i = 1; i <= approvalStatus.num_approvers; i++) {
           var status = _.get(approvalStatus, 'approver_' + i + '_status');
-          var statusIconClass;
-          var connectorClass;
-          var sourceConnectorClass;
           var title = status;
+          var subTitle = undefined;
+          var statusIconClass = undefined;
+          var connectorClass = undefined;
+          var sourceConnectorClass = undefined;
+
           if (status === 'Approved') {
+            subTitle = dateFilter(_.get(approvalStatus, 'approver_' + i + '_approved_at'), 'medium');
             statusIconClass = 'pficon pficon-orders';
             sourceConnectorClass = 'approved';
             connectorClass = 'approved';
           } else if (status === 'Notified') {
             title = 'In Progress';
+            subTitle = momentAgoFilter(_.get(approvalStatus, 'approver_' + i + '_initiated_at'));
             statusIconClass = 'fa fa-spinner';
             connectorClass = 'in-progress';
           } else if (status === 'Pending') {
             statusIconClass = 'pficon pficon-pending';
             connectorClass = 'pending';
           } else if (status === 'Denied') {
+            subTitle = dateFilter(_.get(approvalStatus, 'approver_' + i + '_approved_at'), 'medium');
             statusIconClass = 'pficon pficon-error-circle-o';
             connectorClass = 'denied';
           } else if (status === 'Skipped') {
@@ -99,6 +112,7 @@ angular.module('openshiftConsole')
               id: i + 1,
               type: status,
               title: title,
+              subTitle: subTitle,
               parentId: $scope.isMobile ? undefined : i,
               prevSiblingId: $scope.isMobile ? i : undefined,
               status: status,
@@ -106,21 +120,20 @@ angular.module('openshiftConsole')
               approverName: _.get(approvalStatus, 'approver_' + i + '_name'),
               approverUrl: _.get(approvalStatus, 'approver_' + i + '_url'),
               initiatedTimestamp: _.get(approvalStatus, 'approver_' + i + '_initiated_at'),
-              approvalTimestamp: _.get(approvalStatus, 'approver_' + i + '_approved_at'),
-              width: 230,
-              height: 290
+              width: CARD_WIDTH,
+              height: CARD_HEIGHT
             });
             $scope.data.connections.push(
               {
                 source: {
                   nodeID: i,
-                  xOffset: $scope.isMobile ? 115 : 230,
-                  yOffset: $scope.isMobile ? 300 : 90,
+                  xOffset: $scope.isMobile ? (CARD_WIDTH / 2) : CARD_WIDTH,
+                  yOffset: $scope.isMobile ? (CARD_HEIGHT / 2) : 90,
                   connectorIndex: $scope.isMobile ? 1 : 0
                 },
                 dest: {
                   nodeID: i + 1,
-                  xOffset: $scope.isMobile ? 115 : 0,
+                  xOffset: $scope.isMobile ? (CARD_WIDTH / 2) : 0,
                   yOffset: $scope.isMobile ? 0 : 90,
                   connectorIndex:  $scope.isMobile ? 1 : 0,
                   connectorClass: connectorClass
